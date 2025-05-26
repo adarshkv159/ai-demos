@@ -33,21 +33,25 @@ This model is optimized for performance on edge devices and compatible with TFLi
 
 ---
 
-## 🔧 Requirements
 
-Make sure the following dependencies are installed:
+✅ Dependencies
+Install the required Python packages:
 
-```bash
+bash
+Copy
+Edit
 pip install opencv-python pillow numpy tflite-runtime
+Requirements:
+
 Python 3.6+
 
-OpenCV (for video processing and visualization)
+OpenCV – for video processing and visualization
 
-NumPy (for numerical operations)
+NumPy – for numerical operations
 
-Pillow (image utilities)
+Pillow – for image utilities
 
-tflite-runtime (for model inference)
+tflite-runtime – for running the TensorFlow Lite model
 
 🚀 Running the Code
 1. Run detection using default camera (index 1)
@@ -59,20 +63,20 @@ python detect.py
 bash
 Copy
 Edit
+# Use camera index 0
 python detect.py -i 0
-bash
-Copy
-Edit
+
+# Use a video file
 python detect.py -i path/to/video.mp4
 3. Run detection with hardware acceleration (NPU/GPU)
 bash
 Copy
 Edit
 python detect.py -d libvx_delegate.so
-✅ Make sure the specified delegate library is available on your device.
+✅ Make sure the specified delegate library (libvx_delegate.so) is available on your device.
 
 📝 Label Mapping (labels.py)
-This file should contain a Python dictionary named label2string that maps class indices to human-readable labels. Example:
+This file should contain a Python dictionary named label2string that maps class indices to human-readable labels:
 
 python
 Copy
@@ -84,40 +88,38 @@ label2string = {
     3: 'motorcycle',
     4: 'airplane',
     5: 'bus',
-    ...
+    # Add more classes as needed
 }
-Ensure it matches the labels used by the TFLite model.
+Ensure the label indices match those used by your .tflite model.
 
 🎯 Output
-Detected objects are displayed with:
+The output includes:
 
-Bounding boxes
+🟥 Bounding boxes
 
-Class label
+🏷️ Class labels
 
-FPS (frames per second)
+📈 FPS (frames per second)
 
-Inference time per frame
+⏱️ Inference time per frame
 
-Sample console output:
-
-yaml
+Console Output Example
+text
 Copy
 Edit
 Detection: (84, 130)-(210, 310) Label: person
 FPS: 26  Inference: 15ms
-Sample display:
+Display
+A window will show the live annotated video stream.
 
-A window will show the live video feed with detections annotated.
-
-Press q to exit the video stream.
+Press q to exit the stream.
 
 ⚙️ Internal Processing Flow
 Initialize video source (camera or file)
 
-Load TFLite model (optionally with delegate)
+Load the TFLite model (optionally with delegate)
 
-Preprocess frame: Resize to model input size
+Preprocess frame (resize to model input size)
 
 Run inference
 
@@ -132,10 +134,27 @@ Display FPS and inference time
 Repeat until user exits
 
 💡 Tips
-Use a quantized model (uint8) for best delegate/NPU compatibility.
+Use a quantized model (uint8) for best compatibility with hardware acceleration (e.g., NPU).
 
-For NXP i.MX8MP or similar platforms, use libvx_delegate.so.
+On NXP i.MX8MP or similar devices, use the libvx_delegate.so delegate.
 
-Performance may vary depending on resolution, input size, and hardware acceleration.
+Performance depends on:
 
----
+Input size
+
+Camera resolution
+
+Model complexity
+
+Delegate (NPU/GPU/CPU)
+
+✅ Copy This into Your README.md
+Let me know if you'd like me to paste the entire updated README as a final clean version!
+
+
+
+
+
+
+
+
