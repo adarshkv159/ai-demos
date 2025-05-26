@@ -1,4 +1,4 @@
-# 🔍 Real-Time Object Detection with TensorFlow Lite & OpenCV
+# 🔍 Real-Time Object Detection
 
 This project demonstrates **real-time object detection** using a **quantized MobileNet SSD model** (`ssd_mobilenet_v1_quant.tflite`) with **TensorFlow Lite** and **OpenCV**.
 
