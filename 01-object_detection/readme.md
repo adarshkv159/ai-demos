@@ -138,3 +138,4 @@ For NXP i.MX8MP or similar platforms, use libvx_delegate.so.
 
 Performance may vary depending on resolution, input size, and hardware acceleration.
 
+---
