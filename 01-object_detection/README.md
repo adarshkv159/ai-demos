@@ -64,7 +64,7 @@ python main.py
 
 ```bash
 # Use camera index 0
-python main.py -i 0
+python main.py -i 1
 
 # Use a video file
 python main.py -i path/to/video.mp4
