@@ -54,26 +54,26 @@ pip install opencv-python pillow numpy tflite-runtime
 
 ## 🚀 How to Run
 
-### 1️⃣ Run with default camera (index 1):
+### 1️⃣ Run with default camera (index 0):
 
 ```bash
-python detect.py
+python main.py
 ```
 
 ### 2️⃣ Use a different camera or video file:
 
 ```bash
 # Use camera index 0
-python detect.py -i 0
+python main.py -i 0
 
 # Use a video file
-python detect.py -i path/to/video.mp4
+python main.py -i path/to/video.mp4
 ```
 
 ### 3️⃣ Run with NPU/GPU delegate:
 
 ```bash
-python detect.py -d libvx_delegate.so
+python main.py -d libvx_delegate.so
 ```
 
 > ✅ Ensure `libvx_delegate.so` exists on your device.
