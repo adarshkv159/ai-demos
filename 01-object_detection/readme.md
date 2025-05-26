@@ -1,82 +1,50 @@
-# 🔍 Real-Time Object Detection with TensorFlow Lite & OpenCV
 
-This project demonstrates **real-time object detection** using a **quantized MobileNet SSD model** (`ssd_mobilenet_v1_quant.tflite`) with [TensorFlow Lite](https://www.tensorflow.org/lite) and [OpenCV](https://opencv.org/). It is designed to be portable across platforms such as Linux, Windows, and embedded boards (e.g., NXP i.MX8M Plus) and supports **delegate acceleration** (e.g., NPU or GPU).
+🔍 Real-Time Object Detection with TFLite + OpenCV
+This project uses TensorFlow Lite, OpenCV, and optional NPU acceleration to perform real-time object detection using a quantized MobileNet SSD model.
 
----
-
-## 📁 Project Structure
-
-.
-├── detect.py # Main object detection script
-├── labels.py # Label mapping (class index to label name)
-├── ssd_mobilenet_v1_quant.tflite # TFLite quantized object detection model
-├── README.md # Project documentation
-
-yaml
-Copy
-Edit
-
----
-
-## 🧠 Model Information
-
-- **Model**: SSD MobileNet V1 (Quantized)
-- **Format**: TensorFlow Lite (`.tflite`)
-- **Input Shape**: [1, 300, 300, 3]
-- **Output Tensors**:
-  - Boxes: `[num_boxes, 4]`
-  - Classes: `[num_boxes]`
-  - Scores: `[num_boxes]`
-  - Number of detections: `[1]`
-
-This model is optimized for performance on edge devices and compatible with TFLite delegates like the **NPU on i.MX8MP** via `libvx_delegate.so`.
-
----
-
-
-✅ Dependencies
-Install the required Python packages:
+📦 Requirements
+Install dependencies:
 
 bash
 Copy
 Edit
 pip install opencv-python pillow numpy tflite-runtime
-Requirements:
+✅ Python 3.6+ required
 
-Python 3.6+
+Libraries Used:
 
-OpenCV – for video processing and visualization
+🖼️ opencv-python – Video stream handling & display
 
-NumPy – for numerical operations
+🧮 numpy – Numerical operations
 
-Pillow – for image utilities
+🖌️ pillow – Image utilities
 
-tflite-runtime – for running the TensorFlow Lite model
+🧠 tflite-runtime – Efficient TFLite model inference
 
-🚀 Running the Code
-1. Run detection using default camera (index 1)
+🚀 How to Run
+🖥️ 1. Default Camera (Index 1)
 bash
 Copy
 Edit
 python detect.py
-2. Run detection using another camera or a video file
+🎥 2. Custom Camera or Video File
 bash
 Copy
 Edit
-# Use camera index 0
+# Camera index 0
 python detect.py -i 0
 
-# Use a video file
+# Video file
 python detect.py -i path/to/video.mp4
-3. Run detection with hardware acceleration (NPU/GPU)
+⚡ 3. With Hardware Acceleration (e.g., NPU/GPU)
 bash
 Copy
 Edit
 python detect.py -d libvx_delegate.so
-✅ Make sure the specified delegate library (libvx_delegate.so) is available on your device.
+✅ Make sure libvx_delegate.so exists on your device.
 
-📝 Label Mapping (labels.py)
-This file should contain a Python dictionary named label2string that maps class indices to human-readable labels:
+🧾 Label Mapping (labels.py)
+Create a labels.py file with:
 
 python
 Copy
@@ -88,73 +56,59 @@ label2string = {
     3: 'motorcycle',
     4: 'airplane',
     5: 'bus',
-    # Add more classes as needed
+    # ... add more as needed
 }
-Ensure the label indices match those used by your .tflite model.
+🔁 Must match the model’s class indices.
 
-🎯 Output
-The output includes:
+🎯 What You'll See
+✅ Real-time Output
+🟥 Bounding Boxes
 
-🟥 Bounding boxes
+🏷️ Class Labels
 
-🏷️ Class labels
+📊 FPS and Inference Time
 
-📈 FPS (frames per second)
-
-⏱️ Inference time per frame
-
-Console Output Example
+💬 Console Example
 text
 Copy
 Edit
 Detection: (84, 130)-(210, 310) Label: person
 FPS: 26  Inference: 15ms
-Display
-A window will show the live annotated video stream.
+🪟 Display
+A window shows the video feed with object detections.
 
-Press q to exit the stream.
+Press q to exit.
 
-⚙️ Internal Processing Flow
-Initialize video source (camera or file)
+🔁 Under the Hood
+Open video source (camera or file)
 
-Load the TFLite model (optionally with delegate)
+Load .tflite model (optionally with delegate)
 
-Preprocess frame (resize to model input size)
+Resize frame to model input size
 
 Run inference
 
-Postprocess results:
+Parse output:
 
-Draw bounding boxes
+Get bounding boxes & labels
 
-Map class indices to labels
+Draw overlays
 
-Display FPS and inference time
+Show FPS & timing
 
-Repeat until user exits
+Loop till you quit
 
-💡 Tips
-Use a quantized model (uint8) for best compatibility with hardware acceleration (e.g., NPU).
+💡 Tips & Tricks
+Use quantized TFLite models (uint8) for NPU/GPU compatibility.
 
-On NXP i.MX8MP or similar devices, use the libvx_delegate.so delegate.
+For NXP i.MX8MP, use libvx_delegate.so to run inference on the NPU.
 
-Performance depends on:
+Improve FPS by:
 
-Input size
+Reducing video resolution
 
-Camera resolution
+Choosing lighter models
 
-Model complexity
+Using efficient delegates
 
-Delegate (NPU/GPU/CPU)
-
-✅ Copy This into Your README.md
-Let me know if you'd like me to paste the entire updated README as a final clean version!
-
-
-
-
-
-
-
-
+Let me know if you'd like this saved as a file or turned into a GitHub Gist!
