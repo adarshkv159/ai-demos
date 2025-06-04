@@ -23,12 +23,6 @@ Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M
 
 - **Model**: MobileNetV1 classification model  (Quantized)  
 - **Format**: TensorFlow Lite (`.tflite`)  
-- **Input shape**: `[1, 224, 224, 3]`
-
-### 📤 Output Tensors:
-- `Predictions`: [1,1001] 
-    - Each value corresponds to a class confidence (quantized uint8)
-    - The index with the highest value is the predicted class
 
 ✅ Optimized for edge devices  
 🧠 Compatible with NPU delegate (`libvx_delegate.so`) on platforms like i.MX8MP
@@ -60,23 +54,12 @@ pip install "numpy<2.0"
 
 ## 🚀 How to Run
 
-### 1️⃣ Run with default camera (index 0):
+### 1️⃣ Run with CPU:
 
 ```bash
 python main.py
 ```
-
-### 2️⃣ Use a different camera or video file:
-
-```bash
-# Use camera index 1
-python main.py --camera_id 1
-
-# Use a video file
-python main.py --camera_id path/to/video.mp4
-```
-
-### 3️⃣ Run with NPU/GPU delegate:
+### 2️⃣ Run with NPU/GPU delegate:
 
 ```bash
 python main.py -d path/to/libvx_delegate.so
@@ -84,6 +67,15 @@ python main.py -d path/to/libvx_delegate.so
 
 > ✅ Ensure `libvx_delegate.so` exists on your device.
 
+### 3️⃣ Use a different camera or video file:
+
+```bash
+# Use camera index X
+python main.py --camera_id X
+
+# Use a video file
+python main.py --camera_id path/to/video.mp4
+```
 ---
 
 ## 📝 Label Mapping (`labels.txt`)
