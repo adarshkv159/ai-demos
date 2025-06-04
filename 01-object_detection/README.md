@@ -1,6 +1,6 @@
 # 🔍 Real-Time Object Detection
 
-This project demonstrates **real-time object detection** using a **quantized MobileNet SSD model** (`ssd_mobilenet_v1_quant.tflite`) with **TensorFlow Lite** and **OpenCV**.
+This project demonstrates **real-time object detection** using a **quantized MobileNet SSD model** with **TensorFlow Lite** and **OpenCV**.
 
 Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M Plus), it supports **hardware acceleration** via delegates like **NPU or GPU**.
 
@@ -22,13 +22,6 @@ Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M
 
 - **Model**: SSD MobileNet V1 (Quantized)  
 - **Format**: TensorFlow Lite (`.tflite`)  
-- **Input shape**: `[1, 300, 300, 3]`
-
-### 📤 Output Tensors:
-- `boxes`: [num_boxes, 4]  
-- `classes`: [num_boxes]  
-- `scores`: [num_boxes]  
-- `num_detections`: [1]  
 
 ✅ Optimized for edge devices  
 🧠 Compatible with NPU delegate (`libvx_delegate.so`) on platforms like i.MX8MP
@@ -40,13 +33,12 @@ Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M
 Install with:
 
 ```bash
-pip install opencv-python pillow numpy tflite-runtime
+pip install opencv-python pillow tflite-runtime
 ```
 
 ### Requirements:
 - Python 3.6+
 - OpenCV – for video stream processing
-- NumPy – for numerical operations
 - Pillow – for image handling
 - TFLite Runtime – for inference
 
@@ -54,30 +46,28 @@ pip install opencv-python pillow numpy tflite-runtime
 
 ## 🚀 How to Run
 
-### 1️⃣ Run with default camera (index 0):
+### 1️⃣ Run with CPU:
 
 ```bash
 python main.py
 ```
-
-### 2️⃣ Use a different camera or video file:
-
-```bash
-# Use camera index 0
-python main.py -i 1
-
-# Use a video file
-python main.py -i path/to/video.mp4
-```
-
-### 3️⃣ Run with NPU/GPU delegate:
+### 2️⃣ Run with NPU/GPU delegate:
 
 ```bash
-python main.py -d libvx_delegate.so
+python main.py -d path/to/libvx_delegate.so
 ```
 
 > ✅ Ensure `libvx_delegate.so` exists on your device.
 
+### 3️⃣ Use a different camera or video file:
+
+```bash
+# Use camera index X
+python main.py -i X
+
+# Use a video file
+python main.py -i path/to/video.mp4
+```
 ---
 
 ## 📝 Label Mapping (`labels.py`)
