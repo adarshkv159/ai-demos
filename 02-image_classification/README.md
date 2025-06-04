@@ -40,15 +40,22 @@ Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M
 Install with:
 
 ```bash
-pip install opencv-python numpy tflite-runtime
+pip install opencv-python tflite-runtime
 ```
 
 ### Requirements:
 - Python 3.6+
 - OpenCV – for video stream processing and display
-- NumPy – for numerical operations and tensor handling
 - TFLite Runtime – for inference
 
+### 🔎 Note  
+The `opencv-python` package automatically installs the latest version of **NumPy** that is compatible with your Python version.  
+However, this program (or one of its dependencies) requires **NumPy version 1.x**, because modules compiled against NumPy 1.x may crash when used with NumPy 2.x or later.
+
+To fix this issue, downgrade NumPy by running:  
+```bash
+    pip install "numpy<2.0"
+```
 ---
 
 ## 🚀 How to Run
@@ -72,7 +79,7 @@ python main.py --camera_id path/to/video.mp4
 ### 3️⃣ Run with NPU/GPU delegate:
 
 ```bash
-python main.py -d libvx_delegate.so
+python main.py -d path/to/libvx_delegate.so
 ```
 
 > ✅ Ensure `libvx_delegate.so` exists on your device.
@@ -99,8 +106,8 @@ This file maps class indices to human-readable labels:
 ## 🎯 Output
 
 - 🏷️ Top predicted class labels with confidence scores
--  ⏱️ Inference time per frame (in milliseconds)
--   📤 Console prints showing predicted labels and scores in real-time 
+- ⏱️ Inference time per frame (in milliseconds)
+- 📤 Console prints showing predicted labels and scores in real-time 
 
 ### 📟 Console Output Example
 
