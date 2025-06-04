@@ -41,7 +41,15 @@ pip install opencv-python pillow tflite-runtime
 - OpenCV – for video stream processing
 - Pillow – for image handling
 - TFLite Runtime – for inference
+  
+### 🔎 Note  
+The `opencv-python` package automatically installs the latest version of **NumPy** that is compatible with your Python version.  
+However, this program (or one of its dependencies) requires **NumPy version 1.x**, because modules compiled against NumPy 1.x may crash when used with NumPy 2.x or later.
 
+To fix this issue, downgrade NumPy by running:  
+```bash
+pip install "numpy<2.0"
+```
 ---
 
 ## 🚀 How to Run
