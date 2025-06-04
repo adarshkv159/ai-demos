@@ -1,6 +1,6 @@
 # 🔍 Real-Time Image Classification
 
-This project demonstrates **real-time image classification** using a **quantized MobileNetV1 classification model** (`mobilenet_v1_1.0_224_quant.tflite`) with **TensorFlow Lite** and **OpenCV** for **single-label image classification**.
+This project demonstrates **real-time image classification** using a **quantized MobileNetV1 classification model**  with **TensorFlow Lite** and **OpenCV** for **single-label image classification**.
 
 Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M Plus), it supports **hardware acceleration** via delegates like **NPU or GPU**.
 
