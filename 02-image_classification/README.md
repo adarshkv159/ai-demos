@@ -54,7 +54,7 @@ However, this program (or one of its dependencies) requires **NumPy version 1.x*
 
 To fix this issue, downgrade NumPy by running:  
 ```bash
-    pip install "numpy<2.0"
+pip install "numpy<2.0"
 ```
 ---
 
