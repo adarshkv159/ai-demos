@@ -58,6 +58,40 @@ python main.py
 > ✅ Ensure `libvx_delegate.so` exists on your device.If the delegate .so is missing, script will raise an error and stop.
 ---
 
+## 🎯 Output
+
+- 🖼️ Real-time binary segmentation mask where white regions represent foreground (e.g., person) and black represents background
+
+### 📟 Console Output Example
+
+```text
+[No explicit console labels in current code, but on failure:]  
+Failed to open video capture.  
+Failed to capture image.
+```
+
+### 🖼️ Display
+
+- A window titled "Segmentation Output" showing the live video segmentation mask
+- White areas correspond to detected foreground; black areas correspond to background
+- Press **`q`** to quit.
+
+---
+
+## ⚙️ Internal Processing Flow
+
+ 1. Initialize video capture from the default camera device
+ 2. Load the TensorFlow Lite segmentation model with NPU delegate for acceleration
+ 3. Continuously capture frames from the camera
+ 4. Preprocess each frame by converting color format (BGR to RGB), resizing to model input size, and normalizing pixel values
+ 5. Run inference on the preprocessed frame to generate a segmentation mask
+ 6. Postprocess the output mask by resizing it back to the original frame size and applying a threshold to create a binary mask
+ 7. Generate a segmentation visualization by combining the binary mask with foreground and background colors
+ 8. Display the segmentation mask window in real-time
+ 9. Repeat until exit 
+
+---
+
 
 ## 💡 Tips
 
