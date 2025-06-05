@@ -66,9 +66,9 @@ python main.py
 ### 📟 Console Output Example
 
 ```text
-Input shape: [ 1 96 96  3]
-Output scale: 0.00390625 Zero point: -128
-📷 Camera started. Press 'q' to quit.
+Input details: [ 1 96 96  3]
+Output details: 0.00390625 Zero point: -128
+Camera feed started. Press 'q' to quit.
 Failed to capture frame. Exiting...
 ```
 
