@@ -60,20 +60,21 @@ python main.py
 
 ## 🎯 Output
 
-- 🖼️ Real-time binary segmentation mask where white regions represent foreground (e.g., person) and black represents background
+- 🏷️ Top predicted class labels with confidence scores
+- 📤 Console prints showing predicted labels and scores in real-time
 
 ### 📟 Console Output Example
 
 ```text
-[No explicit console labels in current code, but on failure:]  
-Failed to open video capture.  
-Failed to capture image.
+Input shape: [ 1 96 96  3]
+Output scale: 0.00390625 Zero point: -128
+📷 Camera started. Press 'q' to quit.
+Failed to capture frame. Exiting...
 ```
 
 ### 🖼️ Display
 
-- A window titled "Segmentation Output" showing the live video segmentation mask
-- White areas correspond to detected foreground; black areas correspond to background
+- A window titled "Camera Feed" shows the live video with predicted class label and confidence score
 - Press **`q`** to quit.
 
 ---
