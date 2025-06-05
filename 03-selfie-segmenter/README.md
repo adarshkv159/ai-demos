@@ -67,14 +67,6 @@ python main.py
 
 - 🖼️ Real-time binary segmentation mask where white regions represent foreground (e.g., person) and black represents background
 
-### 📟 Console Output Example
-
-```text
-[No explicit console labels in current code, but on failure:]  
-Failed to open video capture.  
-Failed to capture image.
-```
-
 ### 🖼️ Display
 
 - A window titled "Segmentation Output" showing the live video segmentation mask
