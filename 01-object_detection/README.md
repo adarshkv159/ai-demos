@@ -10,10 +10,10 @@ Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M
 
 ```
 .
-├── detect.py                  # Main object detection script  
-├── labels.py                 # Label mapping (class index to name)  
+├── detect.py                      # Main object detection script  
+├── labels.py                      # Label mapping (class index to name)  
 ├── ssd_mobilenet_v1_quant.tflite  # Quantized TFLite model  
-├── README.md                 # This documentation
+├── README.md                      # This documentation
 ```
 
 ---
