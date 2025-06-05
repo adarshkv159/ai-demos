@@ -81,18 +81,22 @@ Failed to capture frame. Exiting...
 
 ## ⚙️ Internal Processing Flow
 
- 1. Initialize video capture from the default camera device
- 2. Load the TensorFlow Lite segmentation model with NPU delegate for acceleration
- 3. Continuously capture frames from the camera
- 4. Preprocess each frame by converting color format (BGR to RGB), resizing to model input size, and normalizing pixel values
- 5. Run inference on the preprocessed frame to generate a segmentation mask
- 6. Postprocess the output mask by resizing it back to the original frame size and applying a threshold to create a binary mask
- 7. Generate a segmentation visualization by combining the binary mask with foreground and background colors
- 8. Display the segmentation mask window in real-time
- 9. Repeat until exit 
+1. Initialize video source (camera or file)
+2. Load TFLite classification model with NPU delegate for acceleration
+3. Retrieve input and output tensor details (shape, dtype, quantization parameters)
+4. Continuously capture frames from the live camera feed
+5. Preprocess each frame:
+   - Resize to match model input dimensions
+   - Convert color format from BGR to RGB
+   - Add batch dimension and cast to required data type
+6. Set the preprocessed frame as input tensor and invoke the interpreter
+7. Retrieve output tensor and apply dequantization using scale and zero-point
+8. Identify the class with the highest confidence and extract prediction details
+9. Overlay the predicted class label and confidence score on the video frame
+10. Display the annotated frame in a window titled "Camera Feed"
+11. Repeat until exit
 
 ---
-
 
 ## 💡 Tips
 
