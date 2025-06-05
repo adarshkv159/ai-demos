@@ -6,6 +6,10 @@ Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M
 
 ---
 
+![Demo GIF](output.gif)
+
+---
+
 ## 📁 Project Structure
 
 ```
