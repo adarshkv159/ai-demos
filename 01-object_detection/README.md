@@ -6,7 +6,7 @@ Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M
 
 ---
 
-![Demo GIF](demo.gif)
+![Demo GIF](output.gif)
 
 ---
 
