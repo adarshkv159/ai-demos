@@ -3,8 +3,10 @@
 This project demonstrates how to run google-corel [project - PoseNet](https://github.com/google-coral/project-posenet)  on a phycore-imx8m pluse  using the TensorFlow Lite Runtime. It attempts to load an NPU delegate if available, falling back to CPU inference otherwise. After inference, it uses DBSCAN clustering to select and render keypoints belonging to the main (highest‐confidence) person in the frame.
  
 ---
- 
+
 ![Demo Image](output.png)
+
+---
  
 ## Table of Contents
  
