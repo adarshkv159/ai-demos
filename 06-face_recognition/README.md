@@ -67,70 +67,64 @@ pip install "numpy<2.0"
 
 ## 🚀 How to Run
 
-### 1️⃣ Using a video file:
+### 1️⃣ Run with CPU:
 
 ```bash
 python main.py
 ```
-> ✅ Ensure `libvx_delegate.so` exists on your device.If the delegate .so is missing, script will raise an error and stop.
-
-### 2️⃣ Using a video file:
+### 2️⃣ Run with NPU/GPU delegate:
 
 ```bash
-python livcam_demo.py
-```
-> ✅ Ensure `libvx_delegate.so` exists on your device.If the delegate .so is missing, script will raise an error and stop.
-
----
-
-## 📝 Label Mapping (`labelmap.txt`)
-
-This file maps class indices to human-readable labels:
-
-```text
-   license
+python main.py -d path/to/libvx_delegate.so
 ```
 
-> 🔁 Ensure these labels correspond exactly to the classes your .tflite model was trained on, so that predictions map correctly to meaningful names.
+> ✅ Ensure `libvx_delegate.so` exists on your device.
 
+### 3️⃣ Use a different camera or video file:
+
+```bash
+# Use camera index X
+python main.py -i X
+
+# Use a video file
+python main.py -i path/to/video.mp4
+```
 ---
 
 ## 🎯 Output
 
-- 🏷️ Detected license plate region(s) with bounding boxes and confidence scores drawn on video frames
-- 🔠 Recognized license plate text overlaid on the video in real time (top-right corner of the frame)
-- 🔊 Spoken output of new, valid license plate numbers using espeak + aplay
-- 📤 Console log messages showing detected and recognized license plate strings
-
-### 📟 Console Output Example
-
-```text
-[OCR] Plate: TN10AB1234
-```
+- 🔲 Detected face region(s) highlighted with red bounding boxes on each frame.
+- 🧠 Recognized face name (if matched in database) displayed above the bounding box.
+- 🧾 Instruction message shown at the top: "Press 'a' to add person, 'd' to delete person, 'p' to print database"
+- 🔤 Name input overlay UI appears when you press 'a' or 'd', letting you type a person's name.
+- 💾 database.npy file is created and updated locally to store facial embeddings.
+- 📝 If you press 'p', all known names in the database are shown at the top of the video feed until a key is pressed.
+- ❌ If no face is detected, the face is not added and no name is shown.
 
 ### 🖼️ Display
 
-- A window titled "Detection + OCR" shows the video with predicted class label and confidence score
-- The latest detected license plate shown at the top-right
-- Press **`q`** to quit.
+- Live video window titled "img" shows detected faces with red boxes and recognized names in real time.
+- At the top of the frame, a tip line shows: "Press 'a' to add person, 'd' to delete person, 'p' to print database"
+- When 'a' or 'd' is pressed, a text input bar appears at the top to enter the person's name.
+- When 'p' is pressed, a list of all known names is displayed on screen until a key is pressed.
+- If the face is not recognized or doesn't match the database, "Unknown" is displayed above the bounding box.
+- Press Ctrl+C in the terminal to quit the program and close the window.
 
 ---
 
 ## ⚙️ Internal Processing Flow
 
 1. Initialize video source (camera or file)
-2. Load TFLite classification model (with or without delegate) 
-3. Start OCR worker thread for asynchronous text recognition
+2. Load TFLite face detection and recognition models (with or without delegate)
+3. Initialize face embedding database from file or create empty database
 4. Capture frame from video source
-5. Preprocess frame (convert BGR to RGB, resize to model input size)
-6. Run detection inference on the preprocessed frame
-7. Preprocess each frame:
-   - Extract bounding boxes, class indices, and confidence scores 
-   - Filter detections by confidence threshold 
-8. Extract license plate regions (ROIs) from the frame and enqueue for OCR
-9. OCR worker preprocesses ROIs, runs Tesseract OCR, cleans and validates plate text
-10. Display annotated frame with bounding boxes, labels, and last detected plate text
-11. Repeat until exit
+5. Detect faces in the frame using the face detector model
+6. Extract face regions (ROIs) and apply padding
+7. Generate 512-D embeddings for each face ROI using the recognizer model
+8. Compare embeddings with database entries to find matching names
+9. Display bounding boxes and recognized names on video frames
+10.  Handle user input: 'a' to add new person, 'd' to delete person, 'p' to print database
+11.  Repeat processing frames until program exit
 
 ---
 
