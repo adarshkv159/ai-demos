@@ -100,7 +100,7 @@ while True:
                         cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
     cv2.putText(img, tips, (30, 30),
-                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 3)
+                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
     cv2.imshow('img', img)
     key = cv2.waitKey(1) & 0xFF
     if (key == ord('a')):
