@@ -40,6 +40,7 @@ Install with:
 
 ```bash
 apt install tesseract-ocr
+apt install espeak alsa-utils
 pip install opencv-python tflite-runtime pytesseract
 ```
 
@@ -49,6 +50,8 @@ pip install opencv-python tflite-runtime pytesseract
 - TFLite Runtime – for inference
 - Tesseract OCR Engine - the actual OCR engine(installed via apt)
 - Pytesseract - python wrapper for Tesseract
+- espeak – command-line Text-to-Speech (TTS) engine
+- alsa-utils – ALSA sound utilities including aplay for audio playback
 
 ### 🔎 Note  
 The `opencv-python` package automatically installs the latest version of **NumPy** that is compatible with your Python version.  
