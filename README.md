@@ -38,7 +38,7 @@ This repository is **optimized for deployment** on the NXP-based **phyBOARD-Poll
 - 🧠 Custom + Pretrained Models (TFLite, TensorFlow, PyTorch)
 - 🖼️ Built-in visualization for predictions
 - 🧩 Optimized for NPU with quantized models (`int8`)
-- 🔧 Easy to adapt for edge devices like i.MX8MP, Jetson Nano, and Raspberry Pi
+- 🔧 Easy to adapt for edge devices like i.MX8MP , i.MX93 .
 
 ---
 
