@@ -55,6 +55,14 @@ This project demonstrates how to run google-corel [project - PoseNet](https://gi
    * **`tflite-runtime`**: Provides the minimal TFLite interpreter without the full TensorFlow dependency.
    * **`opencv-python`**: for video stream processing
    * **`scikit-learn`**: Required for DBSCAN clustering and `StandardScaler`.
+### Note  
+The `opencv-python` package automatically installs the latest version of **NumPy** that is compatible with your Python version.  
+However, this program (or one of its dependencies) requires **NumPy version 1.x**, because modules compiled against NumPy 1.x may crash when used with NumPy 2.x or later.
+
+To fix this issue, downgrade NumPy by running:  
+```bash
+pip install "numpy<2.0"
+```
  
 3. **Place the PoseNet model file**
    Ensure the quantized PoseNet model is saved as:
