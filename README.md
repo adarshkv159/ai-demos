@@ -20,8 +20,8 @@ This repository is **optimized for deployment** on the NXP-based **phyBOARD-Poll
 
 ## 🗂️ Project Index
 
-| # | Project | Description | Demo |
-|--|---------|-------------|------|
+| # | Project | Description |
+|--|---------|-------------|
 | 01 | [📦 Object Detection](./01-object_detection) | Detects objects in real-time using YOLO or SSD (mobilenet)
 | 02 | [🧠 Image Classification](./02-image_classification) | Classifies input images into categories
 | 03 | [🎭 Selfie Segmentation](./03-selfie-segmenter) | Removes or replaces selfie backgrounds 
