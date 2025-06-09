@@ -62,7 +62,7 @@ This repository is **optimized for deployment** on the NXP-based **phyBOARD-Poll
 ```bash
 # Clone the repository
 git clone https://github.com/adarshkv159/ai-demos.git
-cd your-repo-name
+cd ai-demos
 
 # (Optional) Create a virtual environment
 python -m venv venv && source venv/bin/activate
