@@ -47,13 +47,13 @@ This project demonstrates how to run google-corel [project - PoseNet](https://gi
    pip install --upgrade pip
    pip install \
      numpy \
-     opencv-python-headless \
+     opencv-python \
      tflite-runtime \
      scikit-learn
    ```
  
    * **`tflite-runtime`**: Provides the minimal TFLite interpreter without the full TensorFlow dependency.
-   * **`opencv-python-headless`**: If you do not need GUI (imshow) support, otherwise install `opencv-python`.
+   * **`opencv-python`**: for video stream processing
    * **`scikit-learn`**: Required for DBSCAN clustering and `StandardScaler`.
  
 3. **Place the PoseNet model file**
