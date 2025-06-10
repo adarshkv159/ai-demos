@@ -4,7 +4,7 @@ This project demonstrates how to run google-corel [project - PoseNet](https://gi
  
 ---
 
-![Demo Image](output.png)
+![Demo GIF](output.gif)
 
 ---
  
