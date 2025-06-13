@@ -1,6 +1,6 @@
-# PoseNet Single-Person Inference with NPU Delegate on Phycore-imx8m plus (Python)
+# Pose-Estimation Multi-Person Inference with NPU Delegate on Phycore-imx8m plus (Python)
  
-This project demonstrates how to run google-corel [project - PoseNet](https://github.com/google-coral/project-posenet)  on a phycore-imx8m plus  using the TensorFlow Lite Runtime. It attempts to load an NPU delegate if available, falling back to CPU inference otherwise. After inference, it uses DBSCAN clustering to select and render keypoints belonging to the main (highest‐confidence) person in the frame.
+This project demonstrates how to run mobilenet_v2 (pose-estimation)  on a phycore-imx8m plus  using the TensorFlow Lite Runtime. It attempts to load an NPU delegate if available, falling back to CPU inference otherwise. 
  
 ---
 
@@ -49,12 +49,10 @@ This project demonstrates how to run google-corel [project - PoseNet](https://gi
      numpy \
      opencv-python \
      tflite-runtime \
-     scikit-learn
    ```
  
    * **`tflite-runtime`**: Provides the minimal TFLite interpreter without the full TensorFlow dependency.
    * **`opencv-python`**: for video stream processing
-   * **`scikit-learn`**: Required for DBSCAN clustering and `StandardScaler`.
 ### Note  
 The `opencv-python` package automatically installs the latest version of **NumPy** that is compatible with your Python version.  
 However, this program (or one of its dependencies) requires **NumPy version 1.x**, because modules compiled against NumPy 1.x may crash when used with NumPy 2.x or later.
@@ -64,15 +62,13 @@ To fix this issue, downgrade NumPy by running:
 pip install "numpy<2.0"
 ```
  
-3. **Place the PoseNet model file**
-   Ensure the quantized PoseNet model is saved as:
+3. **Place the Pose-Estimation model file**
+   Ensure the quantized Pose-Estimation model is saved as:
  
    ```text
-   models/posenet_mobilenet_v1_075_353_481_quant.tflite
+   mobilenet_v2_pose_368_432_dm100_integer_quant.tflite 
    ```
- 
-   (You can download a prebuilt TFLite quantized PoseNet from the (https://github.com/google-coral/project-posenet/tree/master/models/mobilenet/components).)
- 
+    
 4. **verify NPU delegate**
  
    * NPU delegate library (e.g., `libvx_delegate.so`), place it under `/usr/lib/`.
@@ -84,22 +80,21 @@ pip install "numpy<2.0"
  
 ```
 .
-├── pose.py                                           # Main script (e.g., live camera inference)
-├── posenet_mobilenet_v1_075_353_481_quant.tflite     # Quantized TFLite model
+├── pose.py                                                  # Main script (e.g., live camera inference)
+├── mobilenet_v2_pose_368_432_dm100_integer_quant.tflite     # Quantized TFLite model
 
 ```
  
-* **`models/posenet_mobilenet_v1_075_353_481_quant.tflite`**
-  Quantized MobileNet V1 PoseNet TensorFlow Lite model.
+* **`mobilenet_v2_pose_368_432_dm100_integer_quant.tflite`**
+  Quantized MobileNet V2 TensorFlow Lite model.
 * **`pose.py`**
   Python script that:
  
   1. Loads the TFLite model (with optional NPU delegate).
   2. Captures frames from a webcam.
-  3. Runs pose estimation (heatmaps + offsets).
+  3. Runs pose estimation.
   4. Decodes keypoint locations & confidence scores.
-  5. Uses DBSCAN to select the main person.
-  6. Draws keypoints & skeleton on the video feed.
+  5. Draws keypoints & skeleton on the video feed.
  
 ---
  
@@ -119,16 +114,8 @@ pip install "numpy<2.0"
  
    * The script will attempt to load the NPU delegate library (`/usr/lib/libvx_delegate.so`).
    * If the delegate fails to load, it prints a warning and falls back to CPU.
-   * A window titled **“PoseNet (Single Person)”** will open showing the webcam feed with drawn keypoints & skeleton.
+   * A window titled **“Pose-Estimation (Multi Person)”** will open showing the webcam feed with drawn keypoints & skeleton.
    * Press **`q`** in the display window to exit and close the camera.
- 
-3. **Adjust parameters (optional)**
- 
-   * Inside `test3.py`, you can modify:
- 
-     * `min_score` in `select_main_person(...)` (default 0.4)
-     * `threshold` in `draw_prediction_on_image(...)` (default 0.3)
-     * DBSCAN parameters: `eps` and `min_samples` for clustering.
  
 ---
  
@@ -158,4 +145,4 @@ output_details = interpreter.get_output_details()
  
 
  
-> **Enjoy experimenting with PoseNet & NPU acceleration!**
+> **Enjoy experimenting with Pose-Estimation & NPU acceleration!**
