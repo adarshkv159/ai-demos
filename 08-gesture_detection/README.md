@@ -57,12 +57,11 @@ Ensure all models and `anchors.csv` are in place as per the structure below.
  
 ```
 .
-├── anchors.csv                                 # Anchor points for palm detection
-├── hand0.bmp                                   # Sample input image
-├── hand_landmark_3d_256_integer_quant.tflite   # Hand landmark model
-├── palm_detection_builtin_256_integer_quant.tflite # Palm detection model
-├── hand_tracker.py                             # Tracker logic and TFLite inference code
-├── main.py                                     # Main application script
+├── anchors.csv                                        # Anchor points for palm detection
+├── hand_landmark_3d_256_integer_quant.tflite          # Hand landmark model
+├── palm_detection_builtin_256_integer_quant.tflite    # Palm detection model
+├── hand_tracker.py                                    # Tracker logic and TFLite inference code
+├── main.py                                            # Main application script
 ```
  
 ---
