@@ -76,6 +76,8 @@ To run real-time hand tracking using a webcam or video device:
 python3 main.py -i /dev/video0
 ```
  
+### 🕶️ Run on NPU
+ 
 To specify a delegate for hardware acceleration:
  
 ```bash
