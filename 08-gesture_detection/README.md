@@ -1,5 +1,4 @@
-
-# Hand Tracking with TFLite (INT8)
+# 🔍Hand Tracking with TFLite (INT8)
  
 A lightweight real-time hand tracking application using TFLite integer-quantized models and OpenCV.
 
