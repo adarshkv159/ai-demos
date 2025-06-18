@@ -9,8 +9,8 @@ import time
 import argparse
 from hand_tracker import HandTracker
 
-PALM_MODEL_PATH = "../models/palm_detection_builtin_256_integer_quant.tflite"
-LANDMARK_MODEL_PATH = "../models/hand_landmark_3d_256_integer_quant.tflite"
+PALM_MODEL_PATH = "palm_detection_builtin_256_integer_quant.tflite"
+LANDMARK_MODEL_PATH = "hand_landmark_3d_256_integer_quant.tflite"
 ANCHORS_PATH = "anchors.csv"
 
 def draw_landmarks(points, frame):
