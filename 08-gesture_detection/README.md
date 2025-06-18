@@ -42,12 +42,7 @@ pip install opencv-python numpy tflite-runtime
  
 ## ⚙️ Installation
  
-Clone the repository and navigate into the project folder:
- 
-```bash
-git clone https://github.com/yourusername/hand-tracking-tflite.git
-cd hand-tracking-tflite
-```
+Clone the repository and navigate into the project folder
  
 Ensure all models and `anchors.csv` are in place as per the structure below.
  
