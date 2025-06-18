@@ -53,12 +53,7 @@ pip install -r requirements.txt
  
 ## 📦 Installation
  
-Clone this repository:
- 
-```bash
-git clone https://github.com/yourusername/pose-estimation-two-model.git
-cd pose-estimation-two-model
-```
+Clone this repository
  
 Make sure the models are present in the directory. If not, they will be downloaded automatically.
  
