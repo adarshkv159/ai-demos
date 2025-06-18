@@ -29,6 +29,9 @@ This repository is **optimized for deployment** on the NXP-based **phyBOARD-Poll
 | 05 | [🔍 Number Plate Extraction](./05-numberplate_extraction) | Detects and extracts license plates using OCR
 | 06 | [🕺 Pose Detection](./06-pose_detection) | Detects human body keypoints
 | 07 | [👤 Face Recognition](./07-face_recognition) | Recognizes or verifies faces from images/video 
+| 08 | [🖐️ Gesture Detection](./08-gesture_detection) | Detects hand gestures 
+| 07 | [🚗 Driver Monitoring System](./09-driver_monitoring_system) | Detects eye-closure and yawning
+
 
 ---
 
