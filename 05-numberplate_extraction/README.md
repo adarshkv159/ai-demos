@@ -14,19 +14,26 @@ Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M
 
 ```
 .
-├── main.py                           # Your main script (e.g., video inference)
-├── livcam_demo.py                    # detection and extraction script for live camera inference
-├── quant_model_NPU_3k.tflite         # Quantized TFLite model 
-├── labelmap.txt                      # Label mapping (class index to name)  
-├── demo.mp4                          # video used in the script 
-├── README.md                         # This documentation
+├── main.py                                    # Your main script 
+├── quant_model_NPU_3k.tflite                  # Quantized TFLite model 
+├── license_plate_character_recognition.tflite # Quantized TFLite model
+├── labelmap.txt                               # Label mapping (class index to name)  
+├── demo.webm                                  # video used in the script 
+├── README.md                                  # This documentation
 ```
 
 ---
 
 ## 🧠 Model Information
 
+**Number plate Detection Model**
+
 - **Model**: Number plate Detection Model (Quantized)  
+- **Format**: TensorFlow Lite (`.tflite`)
+
+**Number plate Extraction Model**
+
+- **Model**: OCR Model (Quantized)  
 - **Format**: TensorFlow Lite (`.tflite`)  
 
 ✅ Optimized for edge devices  
@@ -39,7 +46,6 @@ Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M
 Install with:
 
 ```bash
-apt install tesseract-ocr
 apt install espeak alsa-utils
 pip install opencv-python tflite-runtime pytesseract
 ```
@@ -48,8 +54,6 @@ pip install opencv-python tflite-runtime pytesseract
 - Python 3.6+
 - OpenCV – for video stream processing and display
 - TFLite Runtime – for inference
-- Tesseract OCR Engine - the actual OCR engine(installed via apt)
-- Pytesseract - python wrapper for Tesseract
 - espeak – command-line Text-to-Speech (TTS) engine
 - alsa-utils – ALSA sound utilities including aplay for audio playback
 
@@ -69,13 +73,6 @@ pip install "numpy<2.0"
 
 ```bash
 python main.py
-```
-> ✅ Ensure `libvx_delegate.so` exists on your device.If the delegate .so is missing, script will raise an error and stop.
-
-### 2️⃣ Using a video file:
-
-```bash
-python livcam_demo.py
 ```
 > ✅ Ensure `libvx_delegate.so` exists on your device.If the delegate .so is missing, script will raise an error and stop.
 
@@ -103,7 +100,7 @@ This file maps class indices to human-readable labels:
 ### 📟 Console Output Example
 
 ```text
-[OCR] Plate: TN10AB1234
+[OCR] Detected Plate: R183JF
 ```
 
 ### 🖼️ Display
@@ -116,19 +113,17 @@ This file maps class indices to human-readable labels:
 
 ## ⚙️ Internal Processing Flow
 
-1. Initialize video source (camera or file)
-2. Load TFLite classification model (with or without delegate) 
-3. Start OCR worker thread for asynchronous text recognition
-4. Capture frame from video source
-5. Preprocess frame (convert BGR to RGB, resize to model input size)
-6. Run detection inference on the preprocessed frame
-7. Preprocess each frame:
-   - Extract bounding boxes, class indices, and confidence scores 
-   - Filter detections by confidence threshold 
-8. Extract license plate regions (ROIs) from the frame and enqueue for OCR
-9. OCR worker preprocesses ROIs, runs Tesseract OCR, cleans and validates plate text
-10. Display annotated frame with bounding boxes, labels, and last detected plate text
-11. Repeat until exit
+1. Initialize video source from file (demo.webm) using OpenCV.
+2. Load TFLite object detection model (quant_model_NPU_3k.tflite) with optional libvx_delegate for NPU acceleration.
+3. Load TFLite OCR model (license_plate_character_recognition.tflite) with optional NPU delegate.
+4. Read class labels from labelmap.txt for detected objects.
+5. Capture frame from video source.
+6. Preprocess frame by converting BGR to RGB and resizing to the model’s expected input shape.
+7. Run object detection inference on the preprocessed frame using the detection model.
+8. Extract bounding boxes, class indices, and confidence scores from model output and filter based on threshold.
+9. Crop license plate regions, segment individual characters using contour-based approach, and classify each character with the OCR model.
+10. Validate recognized text using regex patterns for Indian number plates and, if stable, use espeak and aplay to speak the detected plate once.
+11. Display annotated frame with bounding boxes, labels, and recognized plate text, and repeat the loop until video ends or 'q' is pressed.
 
 ---
 
