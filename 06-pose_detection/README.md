@@ -1,4 +1,4 @@
-**Pose Estimation  (Multi person Detection)**
+# 🔍Pose Estimation (Multi person Detection)
  
 ----
 ## 🖼️ Demo Output
