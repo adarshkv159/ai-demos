@@ -104,5 +104,6 @@ python3 main.py -i /dev/video0 -d /usr/lib/libvx_delegate.so
 * Eye open/closed classification
 * Head pose estimation (pitch, yaw, roll)
 * Gaze direction (left/right/up/down)
+* Wake up alert when eyes are closed 
 * Runs efficiently with TFLite quantized models
 * Optional NPU/TPU acceleration
