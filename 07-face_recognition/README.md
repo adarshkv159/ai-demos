@@ -1,6 +1,6 @@
 # 🔍Real-Time Face Detection and Recognition 
 
-This project demonstrates **real-time face detection and recognition** using a **quantized TFLite model**  with **TensorFlow Lite** and **OpenCV**.
+This project demonstrates **real-time face detection and recognition** using a **quantized TFLite model**  with **TensorFlow Lite** and **OpenCV** and enhanced with **voice commands** using **Whisper (OpenAI)** and **Text-to-Speech**.
 
 Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M Plus), it supports **hardware acceleration** via delegates like **NPU or GPU**.
 
@@ -47,13 +47,18 @@ Designed for cross-platform use (Linux, Windows, embedded boards like NXP i.MX8M
 Install with:
 
 ```bash
-pip install opencv-python tflite-runtime 
+pip install opencv-python tflite-runtime pyttsx3
+pip install git+https://github.com/openai/whisper.git
+apt install alsa-utils
 ```
 
 ### Requirements:
 - Python 3.6+
 - OpenCV – for video stream processing and display
 - TFLite Runtime – for inference
+- Pyttsx3 - for Text-to-Speech
+- Whisper - for Speech-to-Text(OpenAI Whisper)
+- ALSA Utils – For audio recording and playback 
 
 ### 🔎 Note  
 The `opencv-python` package automatically installs the latest version of **NumPy** that is compatible with your Python version.  
@@ -90,41 +95,70 @@ python main.py -i X
 python main.py -i path/to/video.mp4
 ```
 ---
+## 🎮 Controls
 
+| Key      |             Action                                |
+| ---------| --------------------------------------------------|
+| `v`      | Start voice command recording                     |
+| `q`      | Quit the program                                  |
+| `1-9`    | Select a number to remove a face (when prompted)  |
+
+---
+## 🎤 Voice Workflow
+
+| Command    |	             Behavior                        |
+| ---------- | --------------------------------------------- |
+| `add`      | Detect face → Record name → Confirm → Store   |
+| `remove`   | List known faces → Say number or name         |
+| `quit`     | 	Exit gracefully                              |
+
+---
 ## 🎯 Output
 
-- 🔲 Detected face region(s) highlighted with red bounding boxes on each frame.
-- 🧠 Recognized face name (if matched in database) displayed above the bounding box.
-- 🧾 Instruction message shown at the top: "Press 'a' to add person, 'd' to delete person, 'p' to print database"
-- 🔤 Name input overlay UI appears when you press 'a' or 'd', letting you type a person's name.
-- 💾 database.npy file is created and updated locally to store facial embeddings.
-- 📝 If you press 'p', all known names in the database are shown at the top of the video feed until a key is pressed.
-- ❌ If no face is detected, the face is not added and no name is shown.
+- 🔲 Detected face region(s) highlighted with red bounding boxes in real time.
+- 🧠 Recognized face name (if matched in database) is displayed above the bounding box.
+- 🗣️ System greets the recognized person with a voice message using TTS.
+- 🆕 Users can add new faces using voice command ("add" or "new").
+- 🗑️ Users can remove known faces using voice command ("remove" or "delete") and confirming by speaking the number or using number keys (1-9).
+- 🔤 Name is added by saying the name aloud, and the system confirms with TTS.
+- 📁 A face database is stored and updated locally using embeddings (database.npy).
+- ❌ If no face is detected or name is not recognized, appropriate voice feedback is given (e.g., "No face detected", "Name not recognized").
 
 ### 🖼️ Display
 
-- Live video window titled "img" shows detected faces with red boxes and recognized names in real time.
-- At the top of the frame, a tip line shows: "Press 'a' to add person, 'd' to delete person, 'p' to print database"
-- When 'a' or 'd' is pressed, a text input bar appears at the top to enter the person's name.
-- When 'p' is pressed, a list of all known names is displayed on screen until a key is pressed.
-- If the face is not recognized or doesn't match the database, "Unknown" is displayed above the bounding box.
-- Press Ctrl+C in the terminal to quit the program and close the window.
+- 👁️ The **main video window** titled **"Face Recognition"** displays:
+  - Detected faces with red bounding boxes.
+  - Recognized names above each detected face.
+  - A help message at the bottom: **"Press 'v' to speak command, 'q' to quit"**.
+- 🎛️ A **side panel window** titled **"Side Panel"** shows:
+  - Current voice command response (e.g., "Hello Arjun", "Please say the name").
+  - Audio recording status (e.g., "Recording started...", "Recording stopped.").
+  - List of saved names for removal (when "remove" command is triggered).
+- 🎤 Press **"v"** to trigger **voice command input** (e.g., add/remove/quit).
+- 🔢 Press a **number key (1-9)** to confirm name removal from the list.
+- ❌ If no face is detected, no name is shown and appropriate feedback is spoken.
+- ⏹️ Press **"q"** or say **"quit"** to exit the application gracefully.
 
 ---
 
 ## ⚙️ Internal Processing Flow
 
 1. Initialize video source (camera or file)
-2. Load TFLite face detection and recognition models (with or without delegate)
-3. Initialize face embedding database from file or create empty database
-4. Capture frame from video source
-5. Detect faces in the frame using the face detector model
-6. Extract face regions (ROIs) and apply padding
-7. Generate 512-D embeddings for each face ROI using the recognizer model
-8. Compare embeddings with database entries to find matching names
-9. Display bounding boxes and recognized names on video frames
-10.  Handle user input: 'a' to add new person, 'd' to delete person, 'p' to print database
-11.  Repeat processing frames until program exit
+2. Load TFLite face detection and recognition models (optionally with delegate like NPU)
+3. Initialize face embedding database from file or create a new one if none exists
+4. Start capturing frames from the video source
+5. Detect face(s) in the frame using the YOLO-based face detector
+6. Extract and pad the detected face region (ROI)
+7. Generate 512-D embeddings for the face using the Facenet recognizer
+8. Match embeddings with stored ones in the database to identify the person
+9. Use TTS to greet the recognized person by name
+10. Show instructions on the video window: "Press 'v' to speak command, 'q' to quit"
+11. On pressing 'v', use Whisper to recognize spoken commands like "add", "remove", or "quit"
+12. For "add": capture a face, ask for the name via voice, confirm via voice, and save it to the database
+13. For "remove": list saved names, accept a number or name via voice, and remove the person from the database
+14. Continuously update the video feed with face bounding boxes, labels, and side panel messages
+15. Exit gracefully on pressing 'q' or saying 'quit'.
+
 
 ---
 
