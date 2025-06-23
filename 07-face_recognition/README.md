@@ -49,7 +49,7 @@ Install with:
 ```bash
 pip install opencv-python tflite-runtime pyttsx3
 pip install git+https://github.com/openai/whisper.git
-apt install alsa-utils
+apt install alsa-utils ffmpeg
 ```
 
 ### Requirements:
@@ -57,8 +57,9 @@ apt install alsa-utils
 - OpenCV – for video stream processing and display
 - TFLite Runtime – for inference
 - Pyttsx3 - for Text-to-Speech
-- Whisper - for Speech-to-Text(OpenAI Whisper)
-- ALSA Utils – For audio recording and playback 
+- Whisper - for Speech-to-Text(OpenAI Model)
+- ALSA Utils – For audio recording and playback
+- FFmpeg - Required by Whisper to handle audio format conversion
 
 ### 🔎 Note  
 The `opencv-python` package automatically installs the latest version of **NumPy** that is compatible with your Python version.  
