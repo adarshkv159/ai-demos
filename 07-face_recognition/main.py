@@ -19,8 +19,8 @@ WHISPER_MODEL = "tiny"
 NAME_PROMPT = "Adarsh, Aarav, Nayan, Riya, Lakshmi, Arjun, Priya, Deepa, Neha, Rohan, Anjali, Vijay, Vinay, Vikram, Sanjay, Suraj"
 COMMAND_PROMPT = "new, add, remove, delete, quit"
 CONFIRM_PROMPT = "yes, no"
-AUDIO_DEVICE = "plughw:3,0"  
-TTS_DEVICE = "plughw:2,0"
+AUDIO_DEVICE = "plughw:2,0"  # Default audio device
+TTS_DEVICE = "plughw:3,0"
 COMMAND_DURATION = 3
 NAME_DURATION = 4
 CONFIRM_DURATION = 3
@@ -499,7 +499,7 @@ def update_side_panel():
     side_panel = np.zeros((SIDE_PANEL_HEIGHT, SIDE_PANEL_WIDTH, 3), dtype=np.uint8)
     y_offset = 20
     font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.4
+    font_scale = 0.6
     color = (255, 255, 255)
     thickness = 1
 
