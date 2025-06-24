@@ -1,6 +1,6 @@
 # 🤖 AI Project Collection
 
-Welcome to a showcase of ** AI applications** — ranging from real-time object detection to medical image classification, built with Python, TensorFlow, and cutting-edge computer vision libraries.  
+Welcome to a showcase of **AI applications** — ranging from real-time object detection to medical image classification, built with Python, TensorFlow, and cutting-edge computer vision libraries.  
 
 > 🚀 Each project is standalone, modular, and demo-ready — designed to run efficiently on edge devices like **phyBOARD-Pollux i.MX 8M Plus**.
 
