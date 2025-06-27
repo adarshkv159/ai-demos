@@ -31,7 +31,7 @@ This repository is **optimized for deployment** on the NXP-based **phyBOARD-Poll
 | 07 | [👤 Face Recognition](./07-face_recognition) | Recognizes or verifies faces from images/video 
 | 08 | [🖐️ Gesture Detection](./08-gesture_detection) | Detects hand gestures 
 | 09 | [🚗 Driver Monitoring System](./09-driver_monitoring_system) | Detects eye-closure and yawning
-| 09 | [🛣️ Lane_Detection](./10-lane_detection) | Highway road lane detection
+| 09 | [🛣️ Lane Detection](./10-lane_detection) | Highway road lane detection
 
 
 ---
