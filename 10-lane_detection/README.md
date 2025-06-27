@@ -146,6 +146,6 @@ Special thanks to the original authors for their contributions to the open-sourc
 * ✅ **Multiple Input Modes**: Support for image, video, and webcam inputs
 * ✅ **INT8 Quantization**: Optimized model for efficient inference
 * ✅ **Real-time Processing**: Suitable for live applications
-* ✅ ** NPU Accelaration**: NPU inference
+* ✅ **NPU Accelaration**: NPU inference
 * ✅ **Cross-platform**: Works on various operating systems
 * ✅ **Easy to Use**: Simple command-line interface
