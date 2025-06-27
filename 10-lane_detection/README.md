@@ -5,7 +5,7 @@ A real-time lane detection system using TensorFlow Lite INT8 quantized model for
 ---
 <p align="center">
   <img src="output.gif" alt="Image Mode Demo" width="45%">
-  <img src="output2.gif" alt="Video Mode Demo" width="45%">
+  <img src="output.gif" alt="Video Mode Demo" width="45%">
 </p>
 
 
