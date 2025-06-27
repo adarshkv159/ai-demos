@@ -3,7 +3,11 @@
 A real-time lane detection system using TensorFlow Lite INT8 quantized model for efficient inference with NPU acceleration. This project provides multiple inference modes including image, video, and webcam detection.
 
 ---
-![Demo GIF](output.gif)
+<p align="center">
+  <img src="output.gif" alt="Image Mode Demo" width="45%">
+  <img src="output2.gif" alt="Video Mode Demo" width="45%">
+</p>
+
 
 ---
 
