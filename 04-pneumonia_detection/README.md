@@ -57,7 +57,7 @@ pip install "numpy<2.0"
 ## 🚀 How to Run
 
 ```bash
-python main.py
+python detect.py
 ```
 > ✅ Ensure `libvx_delegate.so` exists on your device.If the delegate .so is missing, script will raise an error and stop.
 ---
