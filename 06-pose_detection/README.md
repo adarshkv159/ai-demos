@@ -4,7 +4,7 @@
 ## 🖼️ Demo Output
 
 <p align="center">
-  <img src="original.gif" alt="Image Mode Demo" width="45%">
+  <img src="roarm_output.gif" alt="Image Mode Demo" width="45%">
   <img src="output.gif" alt="Video Mode Demo" width="45%">
 </p>
 
