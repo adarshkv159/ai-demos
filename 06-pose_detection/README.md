@@ -99,6 +99,13 @@ python pose.py -i path_to_input_image.jpg -s output_image.png
 ### 📹 Video Mode (webcam or video file)
  
 Use webcam:
+
+Roarm:
+```bash
+python roarm.py -v 0 -d /usr/lib/libvx_delegate.so
+```
+
+Pose-Detection:
  
 ```bash
 python pose.py -v 0
