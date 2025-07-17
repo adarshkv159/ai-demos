@@ -133,6 +133,4 @@ python pose.py -v 0 --delegate /usr/lib/libvx_delegate.so
 | ssd\_mobilenet\_v1\_quant.tflite       | Person detection    | TFLite (INT8) |
 | pose\_resnet\_50\_256x192\_int8.tflite | Keypoint Estimation | TFLite (INT8) |
  
-> Models are auto-downloaded from Google Cloud if not found locally.
- 
 ---
