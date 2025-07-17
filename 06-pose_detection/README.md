@@ -3,9 +3,9 @@
 ----
 ## 🖼️ Demo Output
 
-<p align="center" style="display: flex; justify-content: center; gap: 5px;">
-  <img src="roarm_output.gif" alt="Image Mode Demo" style="width: 45%; height: auto;">
-  <img src="output.gif" alt="Video Mode Demo" style="width: 45%; height: auto;">
+<p align="center">
+  <img src="original.gif" alt="Image Mode Demo" width="45%">
+  <img src="output.gif" alt="Video Mode Demo" width="45%">
 </p>
 
 ---
