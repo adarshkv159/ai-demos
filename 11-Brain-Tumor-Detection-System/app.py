@@ -366,7 +366,7 @@ class BrainTumorDetectionApp:
             self.predict_btn.config(state='normal')
     
     def display_results(self):
-        """Display prediction results"""
+        """Display prediction results with enhanced color highlighting"""
         if not self.prediction_result:
             return
         
@@ -384,38 +384,70 @@ Confidence Score: {result['confidence']*100:.2f}%
 DETAILED CLASSIFICATION PROBABILITIES:
 {'='*60}
 """
-        for i, (class_name, prob) in enumerate(zip(self.class_labels, result['probabilities'])):
-            status = "✓ DETECTED" if i == np.argmax(result['probabilities']) else ""
-            class_display = self.format_class_name(class_name)
-            results_content += f"{class_display:12}: {prob*100:6.2f}% {status}\n"
         
-        results_content += f"\n{'='*60}\n"
-        results_content += f"Model Type: INT8 Quantized TensorFlow Lite\n"
-        results_content += f"Runtime: TFLite Runtime\n"
-        results_content += f"Acceleration: {result.get('acceleration_mode', 'Unknown')}\n"
-        results_content += f"Inference Time: {result.get('inference_time', 0):.1f} ms\n"
-        results_content += f"Analysis completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-        results_content += f"Input image: {os.path.basename(self.current_image_path) if self.current_image_path else 'Unknown'}\n"
+        # Insert the basic content first
+        self.results_text.insert(1.0, results_content)
+        
+        # Add classification probabilities with color highlighting
+        line_num = 8  # Starting line for probabilities
+        for i, (class_name, prob) in enumerate(zip(self.class_labels, result['probabilities'])):
+            is_predicted = i == np.argmax(result['probabilities'])
+            status = "✓ DETECTED" if is_predicted else ""
+            class_display = self.format_class_name(class_name)
+            
+            prob_line = f"{class_display:12}: {prob*100:6.2f}% {status}\n"
+            self.results_text.insert(f"{line_num}.0", prob_line)
+            
+            # Color highlighting for detected classes
+            if is_predicted:
+                if class_name.lower() == 'notumor':
+                    # Green for no tumor
+                    self.results_text.tag_add("no_tumor_detected", f"{line_num}.0", f"{line_num}.end")
+                    self.results_text.tag_config("no_tumor_detected", 
+                                                foreground="#27ae60", 
+                                                font=('Arial', 11, 'bold'),
+                                                background="#e8f5e8")
+                else:
+                    # Red for tumor detected
+                    self.results_text.tag_add("tumor_detected", f"{line_num}.0", f"{line_num}.end")
+                    self.results_text.tag_config("tumor_detected", 
+                                                foreground="#e74c3c", 
+                                                font=('Arial', 11, 'bold'),
+                                                background="#fdf2f2")
+            line_num += 1
+        
+        # Add remaining info
+        remaining_content = f"\n{'='*60}\n"
+        remaining_content += f"Model Type: INT8 Quantized TensorFlow Lite\n"
+        remaining_content += f"Runtime: TFLite Runtime\n"
+        remaining_content += f"Acceleration: {result.get('acceleration_mode', 'Unknown')}\n"
+        remaining_content += f"Inference Time: {result.get('inference_time', 0):.1f} ms\n"
+        remaining_content += f"Analysis completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        remaining_content += f"Input image: {os.path.basename(self.current_image_path) if self.current_image_path else 'Unknown'}\n"
         
         if 'quantized_output' in result:
             qo = result['quantized_output'][0]
-            results_content += f"\nDEBUG INFO:\n"
-            results_content += f"Quantized output range: [{min(qo)}, {max(qo)}]\n"
+            remaining_content += f"\nDEBUG INFO:\n"
+            remaining_content += f"Quantized output range: [{min(qo)}, {max(qo)}]\n"
         
-        self.results_text.insert(1.0, results_content)
+        self.results_text.insert(tk.END, remaining_content)
         
-        # Color coding for result text line
+        # Enhanced color highlighting for the primary result line
+        primary_result_line = "3.0"
         if result['color'] == 'red':
-            # "Primary Result: " is line 3; tag the part after the colon
-            start_index = "3.16"
-            end_index = "3.end"
-            self.results_text.tag_add("tumor", start_index, end_index)
-            self.results_text.tag_config("tumor", foreground="red", font=('Arial', 11, 'bold'))
+            # Highlight the entire primary result line in red for tumor detection
+            self.results_text.tag_add("primary_tumor", "4.0", "4.end")
+            self.results_text.tag_config("primary_tumor", 
+                                       foreground="#e74c3c", 
+                                       font=('Arial', 11, 'bold'),
+                                       background="#fdf2f2")
         else:
-            start_index = "3.16"
-            end_index = "3.end"
-            self.results_text.tag_add("no_tumor", start_index, end_index)
-            self.results_text.tag_config("no_tumor", foreground="green", font=('Arial', 11, 'bold'))
+            # Highlight the entire primary result line in green for no tumor
+            self.results_text.tag_add("primary_no_tumor", "4.0", "4.end")
+            self.results_text.tag_config("primary_no_tumor", 
+                                       foreground="#27ae60", 
+                                       font=('Arial', 11, 'bold'),
+                                       background="#e8f5e8")
         
         self.results_text.config(state='disabled')
     
