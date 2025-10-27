@@ -23,7 +23,7 @@ This repository is **optimized for deployment** on the NXP-based **phyBOARD-Poll
 | # | Project | Description |
 |--|---------|-------------|
 | 01 | [📦 Object Detection](./01-object_detection) | Detects objects in real-time using YOLO or SSD (mobilenet)
-| 02 | [🧠 Image Classification](./02-image_classification) | Classifies input images into categories
+| 02 | [🏞 Image Classification](./02-image_classification) | Classifies input images into categories
 | 03 | [🎭 Selfie Segmentation](./03-selfie-segmenter) | Removes or replaces selfie backgrounds 
 | 04 | [🩺 Pneumonia Detection](./04-pneumonia_detection) | Detects pneumonia from X-rays
 | 05 | [🔍 Number Plate Extraction](./05-numberplate_extraction) | Detects and extracts license plates using OCR
