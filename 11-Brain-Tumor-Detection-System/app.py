@@ -24,7 +24,7 @@ class BrainTumorDetectionApp:
     def __init__(self, root, delegate_path=None):
         self.root = root
         self.root.title("Brain Tumor Detection System - Quantized Model (TFLite Runtime)")
-        self.root.geometry("800x700")
+        self.root.geometry("1100x700")
         self.root.configure(bg='#f0f0f0')
         
         self.delegate_path = delegate_path
@@ -38,14 +38,11 @@ class BrainTumorDetectionApp:
             self.input_details = self.interpreter.get_input_details()
             self.output_details = self.interpreter.get_output_details()
             
-            # Extract quantization parameters from your model info
-            # Input: uint8[-1,224,224,3], quantization: 0.003921568859368563 * q
-            self.input_scale = 0.003921568859368563  # From your model info
-            self.input_zero_point = 0  # Standard for 0.003921... scale (1/255)
-            
-            # Output: int8[-1,4], quantization: 0.00390625 * (q + 128)
-            self.output_scale = 0.00390625  # From your model info  
-            self.output_zero_point = -128  # From your model info (q + 128 means zero_point = -128)
+            # Quantization parameters from model info
+            self.input_scale = 0.003921568859368563  # 1/255
+            self.input_zero_point = 0
+            self.output_scale = 0.00390625
+            self.output_zero_point = -128
             
             print("✅ Quantized TFLite model loaded successfully!")
             print(f"📐 Input: {self.input_details[0]['shape']}, dtype: {self.input_details[0]['dtype']}")
@@ -71,8 +68,6 @@ class BrainTumorDetectionApp:
     
     def load_model_with_delegate(self):
         """Load TFLite model with NPU delegate support and CPU fallback"""
-        
-        # Try loading with delegate first (NPU acceleration)
         if self.delegate_path and os.path.exists(self.delegate_path):
             try:
                 print(f"🚀 Attempting to load NPU delegate: {self.delegate_path}")
@@ -85,7 +80,6 @@ class BrainTumorDetectionApp:
                 self.acceleration_mode = "NPU (Hardware Accelerated)"
                 print("✅ NPU delegate loaded successfully!")
                 return
-                
             except Exception as e:
                 print(f"⚠️  NPU delegate failed: {e}")
                 print("🔄 Falling back to CPU...")
@@ -97,7 +91,6 @@ class BrainTumorDetectionApp:
             self.interpreter.allocate_tensors()
             self.acceleration_mode = "CPU Only"
             print("✅ CPU fallback successful!")
-            
         except Exception as e:
             print(f"❌ CPU fallback failed: {e}")
             raise e
@@ -107,16 +100,25 @@ class BrainTumorDetectionApp:
         # Title
         title_label = tk.Label(self.root, text="Brain Tumor Detection System (TFLite Runtime)", 
                               font=('Arial', 18, 'bold'), bg='#f0f0f0', fg='#2c3e50')
-        title_label.pack(pady=20)
+        title_label.pack(pady=10)
         
-        # Main frame
+        # Main frame (holds three columns)
         main_frame = tk.Frame(self.root, bg='#f0f0f0')
-        main_frame.pack(expand=True, fill='both', padx=20, pady=10)
+        main_frame.pack(expand=True, fill='both', padx=10, pady=10)
         
         # Left frame for controls
-        control_frame = tk.Frame(main_frame, bg='#f0f0f0', width=200)
-        control_frame.pack(side='left', fill='y', padx=(0, 20))
+        control_frame = tk.Frame(main_frame, bg='#f0f0f0', width=220)
+        control_frame.pack(side='left', fill='y', padx=(0, 10))
         control_frame.pack_propagate(False)
+        
+        # Center frame for image
+        center_frame = tk.Frame(main_frame, bg='#f0f0f0')
+        center_frame.pack(side='left', expand=True, fill='both')
+        
+        # Right frame for results (moved from bottom to right)
+        results_container = tk.Frame(main_frame, bg='#f0f0f0', width=360)
+        results_container.pack(side='right', fill='y', padx=(10, 0))
+        results_container.pack_propagate(False)
         
         # Upload button
         self.upload_btn = tk.Button(control_frame, text="📁 Upload Image", 
@@ -165,9 +167,8 @@ class BrainTumorDetectionApp:
                                   font=('Arial', 10, 'bold'), bg='#f0f0f0')
         info_frame.pack(pady=20, fill='x')
         
-        # Dynamic model info based on acceleration mode
         acceleration_info = getattr(self, 'acceleration_mode', 'Loading...')
-        model_info = f"• INT8 Quantized\\n• TFLite Runtime\\n• {acceleration_info}\\n• Size: ~75% smaller"
+        model_info = f"• INT8 Quantized\n• TFLite Runtime\n• {acceleration_info}\n• Size: ~75% smaller"
         tk.Label(info_frame, text=model_info, font=('Arial', 9), 
                 bg='#f0f0f0', justify='left').pack(pady=5)
         
@@ -176,37 +177,32 @@ class BrainTumorDetectionApp:
             delegate_frame = tk.LabelFrame(control_frame, text="NPU Delegate", 
                                           font=('Arial', 10, 'bold'), bg='#f0f0f0')
             delegate_frame.pack(pady=10, fill='x')
-            
             delegate_name = os.path.basename(self.delegate_path) if self.delegate_path else "None"
-            delegate_info = f"• Delegate: {delegate_name}\\n• Hardware Acceleration"
+            delegate_info = f"• Delegate: {delegate_name}\n• Hardware Acceleration"
             tk.Label(delegate_frame, text=delegate_info, font=('Arial', 9), 
                     bg='#f0f0f0', justify='left').pack(pady=5)
         
-        # Right frame for image and results
-        display_frame = tk.Frame(main_frame, bg='#f0f0f0')
-        display_frame.pack(side='right', expand=True, fill='both')
-        
-        # Image display frame
-        self.image_frame = tk.LabelFrame(display_frame, text="Input Image", 
+        # Center: Image display frame
+        self.image_frame = tk.LabelFrame(center_frame, text="Input Image", 
                                        font=('Arial', 12, 'bold'), bg='#f0f0f0')
-        self.image_frame.pack(fill='both', expand=True, pady=(0, 10))
+        self.image_frame.pack(fill='both', expand=True)
         
         # Image label
-        self.image_label = tk.Label(self.image_frame, text="No image selected\\n\\nClick 'Upload Image' to begin", 
+        self.image_label = tk.Label(self.image_frame, text="No image selected\n\nClick 'Upload Image' to begin", 
                                    font=('Arial', 14), bg='white', fg='#7f8c8d',
                                    width=40, height=15, relief='sunken', bd=2)
         self.image_label.pack(expand=True, fill='both', padx=10, pady=10)
         
-        # Results frame
-        self.results_frame = tk.LabelFrame(display_frame, text="Detection Results", 
+        # Right: Results frame moved to the right side
+        self.results_frame = tk.LabelFrame(results_container, text="Detection Results", 
                                          font=('Arial', 12, 'bold'), bg='#f0f0f0')
-        self.results_frame.pack(fill='x', pady=(10, 0))
+        self.results_frame.pack(fill='both', expand=True)
         
         # Results display
         self.results_text = tk.Text(self.results_frame, height=8, font=('Arial', 11),
                                    bg='white', fg='#2c3e50', relief='sunken', bd=2,
                                    wrap='word', state='disabled')
-        self.results_text.pack(fill='x', padx=10, pady=10)
+        self.results_text.pack(fill='both', expand=True, padx=10, pady=10)
         
         # Status bar
         self.status_var = tk.StringVar()
@@ -242,70 +238,50 @@ class BrainTumorDetectionApp:
                 
                 # Clear previous results
                 self.clear_results()
-                
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to load image: {str(e)}")
                 self.status_var.set("Error loading image")
     
     def load_and_display_image(self, file_path):
         """Load and display image in the GUI"""
-        # Load image using OpenCV
         image = cv2.imread(file_path)
         if image is None:
             raise ValueError("Could not load image. Please check the file format.")
         
-        # Convert BGR to RGB for display
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         self.current_image = image_rgb
         
-        # Resize image for display while maintaining aspect ratio
-        display_image = self.resize_image_for_display(image_rgb, max_size=(400, 300))
+        display_image = self.resize_image_for_display(image_rgb, max_size=(600, 500))
         
-        # Convert to PIL Image and then to PhotoImage
         pil_image = Image.fromarray(display_image)
         photo = ImageTk.PhotoImage(pil_image)
         
-        # Update image label
         self.image_label.config(image=photo, text="")
         self.image_label.image = photo  # Keep a reference
     
-    def resize_image_for_display(self, image, max_size=(400, 300)):
+    def resize_image_for_display(self, image, max_size=(600, 500)):
         """Resize image for display while maintaining aspect ratio"""
         height, width = image.shape[:2]
         max_width, max_height = max_size
-        
-        # Calculate scaling factor
         scale = min(max_width/width, max_height/height)
-        
         if scale < 1:
             new_width = int(width * scale)
             new_height = int(height * scale)
             resized = cv2.resize(image, (new_width, new_height), interpolation=cv2.INTER_AREA)
             return resized
-        
         return image
     
     def preprocess_image_for_quantized_model(self, image):
         """Preprocess image for quantized model inference"""
-        # Resize to model input size (224x224)
         resized = cv2.resize(image, (self.image_size, self.image_size))
-        
-        # Normalize to [0, 1] range (same as training)
         normalized = resized.astype(np.float32) / 255.0
-        
-        # Quantize input to UINT8 format
-        # Formula: quantized_value = round(float_value / scale + zero_point)
         quantized = np.round(normalized / self.input_scale + self.input_zero_point)
         quantized = np.clip(quantized, 0, 255).astype(np.uint8)
-        
-        # Add batch dimension
         quantized = np.expand_dims(quantized, axis=0)
-        
         return quantized
     
     def dequantize_output(self, quantized_output):
         """Convert quantized INT8 output back to float32 probabilities"""
-        # Formula: float_value = scale * (quantized_value - zero_point)
         float_output = self.output_scale * (quantized_output.astype(np.float32) - self.output_zero_point)
         return float_output
     
@@ -329,44 +305,31 @@ class BrainTumorDetectionApp:
             return
         
         try:
-            # Show progress
             self.progress.start()
             self.predict_btn.config(state='disabled')
             accel_mode = getattr(self, 'acceleration_mode', 'Unknown')
             self.status_var.set(f"Processing with {accel_mode}...")
             self.root.update()
             
-            # Preprocess image for quantized model
             quantized_input = self.preprocess_image_for_quantized_model(self.current_image)
-            
-            # Set input tensor (UINT8 format)
             self.interpreter.set_tensor(self.input_details[0]['index'], quantized_input)
             
-            # Run inference (with NPU acceleration if available)
             import time
             start_time = time.perf_counter()
             self.interpreter.invoke()
-            inference_time = (time.perf_counter() - start_time) * 1000  # Convert to ms
+            inference_time = (time.perf_counter() - start_time) * 1000  # ms
             
-            # Get quantized output (INT8 format)
             quantized_output = self.interpreter.get_tensor(self.output_details[0]['index'])
-            
-            # Dequantize output to get float32 logits
             float_output = self.dequantize_output(quantized_output)
             
-            # Apply softmax to get probabilities
-            logits = float_output[0]  # Remove batch dimension
-            
-            # Apply softmax for numerical stability
+            logits = float_output[0]
             exp_logits = np.exp(logits - np.max(logits))
             probabilities = exp_logits / np.sum(exp_logits)
             
-            # Get prediction
             predicted_class_index = np.argmax(probabilities)
             confidence_score = probabilities[predicted_class_index]
-            
-            # Determine result
             predicted_class = self.class_labels[predicted_class_index]
+            
             if predicted_class.lower() == 'notumor':
                 result_text = "No Tumor Detected"
                 result_color = "green"
@@ -375,7 +338,6 @@ class BrainTumorDetectionApp:
                 result_text = f"Tumor Detected: {formatted_class}"
                 result_color = "red"
             
-            # Store results
             self.prediction_result = {
                 'result': result_text,
                 'predicted_class': predicted_class,
@@ -384,18 +346,14 @@ class BrainTumorDetectionApp:
                 'color': result_color,
                 'inference_time': inference_time,
                 'acceleration_mode': accel_mode,
-                'quantized_output': quantized_output.tolist(),  # For debugging
-                'float_output': float_output.tolist()  # For debugging
+                'quantized_output': quantized_output.tolist(),
+                'float_output': float_output.tolist()
             }
             
-            # Display results
             self.display_results()
-            
-            # Enable save button
             self.save_btn.config(state='normal')
-            
             self.status_var.set(f"Inference completed ({inference_time:.1f}ms) - {accel_mode}")
-            
+        
         except Exception as e:
             messagebox.showerror("Error", f"Prediction failed: {str(e)}")
             self.status_var.set("Prediction failed")
@@ -414,11 +372,9 @@ class BrainTumorDetectionApp:
         
         result = self.prediction_result
         
-        # Enable text widget for editing
         self.results_text.config(state='normal')
         self.results_text.delete(1.0, tk.END)
         
-        # Format results - FIXED multiline string
         results_content = f"""BRAIN TUMOR DETECTION RESULTS (TFLite Runtime)
 {'='*60}
 
@@ -428,38 +384,39 @@ Confidence Score: {result['confidence']*100:.2f}%
 DETAILED CLASSIFICATION PROBABILITIES:
 {'='*60}
 """
-        
-        # Add individual class probabilities
         for i, (class_name, prob) in enumerate(zip(self.class_labels, result['probabilities'])):
             status = "✓ DETECTED" if i == np.argmax(result['probabilities']) else ""
             class_display = self.format_class_name(class_name)
-            results_content += f"{class_display:12}: {prob*100:6.2f}% {status}\\n"
+            results_content += f"{class_display:12}: {prob*100:6.2f}% {status}\n"
         
-        results_content += f"\\n{'='*60}\\n"
-        results_content += f"Model Type: INT8 Quantized TensorFlow Lite\\n"
-        results_content += f"Runtime: TFLite Runtime\\n"
-        results_content += f"Acceleration: {result.get('acceleration_mode', 'Unknown')}\\n"
-        results_content += f"Inference Time: {result.get('inference_time', 0):.1f} ms\\n"
-        results_content += f"Analysis completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\\n"
-        results_content += f"Input image: {os.path.basename(self.current_image_path) if self.current_image_path else 'Unknown'}\\n"
+        results_content += f"\n{'='*60}\n"
+        results_content += f"Model Type: INT8 Quantized TensorFlow Lite\n"
+        results_content += f"Runtime: TFLite Runtime\n"
+        results_content += f"Acceleration: {result.get('acceleration_mode', 'Unknown')}\n"
+        results_content += f"Inference Time: {result.get('inference_time', 0):.1f} ms\n"
+        results_content += f"Analysis completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        results_content += f"Input image: {os.path.basename(self.current_image_path) if self.current_image_path else 'Unknown'}\n"
         
-        # Add debug info (optional)
         if 'quantized_output' in result:
-            results_content += f"\\nDEBUG INFO:\\n"
-            results_content += f"Quantized output range: [{min(result['quantized_output'][0])}, {max(result['quantized_output'][0])}]\\n"
+            qo = result['quantized_output'][0]
+            results_content += f"\nDEBUG INFO:\n"
+            results_content += f"Quantized output range: [{min(qo)}, {max(qo)}]\n"
         
-        # Insert results
         self.results_text.insert(1.0, results_content)
         
-        # Color coding for result
+        # Color coding for result text line
         if result['color'] == 'red':
-            self.results_text.tag_add("tumor", "3.16", "3.end")
+            # "Primary Result: " is line 3; tag the part after the colon
+            start_index = "3.16"
+            end_index = "3.end"
+            self.results_text.tag_add("tumor", start_index, end_index)
             self.results_text.tag_config("tumor", foreground="red", font=('Arial', 11, 'bold'))
         else:
-            self.results_text.tag_add("no_tumor", "3.16", "3.end")
+            start_index = "3.16"
+            end_index = "3.end"
+            self.results_text.tag_add("no_tumor", start_index, end_index)
             self.results_text.tag_config("no_tumor", foreground="green", font=('Arial', 11, 'bold'))
         
-        # Disable text widget
         self.results_text.config(state='disabled')
     
     def clear_results(self):
@@ -475,14 +432,10 @@ DETAILED CLASSIFICATION PROBABILITIES:
         self.current_image_path = None
         self.prediction_result = None
         
-        # Reset image display - FIXED string
-        self.image_label.config(image="", text="No image selected\\n\\nClick 'Upload Image' to begin")
+        self.image_label.config(image="", text="No image selected\n\nClick 'Upload Image' to begin")
         self.image_label.image = None
         
-        # Clear results
         self.clear_results()
-        
-        # Reset buttons
         self.predict_btn.config(state='disabled')
         self.save_btn.config(state='disabled')
         
@@ -496,7 +449,6 @@ DETAILED CLASSIFICATION PROBABILITIES:
             return
         
         try:
-            # Ask for save location
             file_path = filedialog.asksaveasfilename(
                 title="Save Results",
                 defaultextension=".txt",
@@ -507,14 +459,11 @@ DETAILED CLASSIFICATION PROBABILITIES:
             )
             
             if file_path:
-                # Get results content
                 results_content = self.results_text.get(1.0, tk.END)
-                
-                # Write to file
                 with open(file_path, 'w') as f:
                     f.write(results_content)
                 
-                messagebox.showinfo("Success", f"Results saved to:\\n{file_path}")
+                messagebox.showinfo("Success", f"Results saved to:\n{file_path}")
                 self.status_var.set(f"Results saved: {os.path.basename(file_path)}")
         
         except Exception as e:
@@ -537,27 +486,21 @@ def parse_arguments():
 
 def main():
     """Main function to run the application"""
-    
-    # Parse command line arguments
     args = parse_arguments()
     
-    # Check if quantized model file exists
     model_file = args.model
     if not os.path.exists(model_file):
         print(f"❌ Model file '{model_file}' not found!")
-        
-        # Show GUI error if no command line mode
-        if len(sys.argv) == 1:  # No command line arguments
+        if len(sys.argv) == 1:
             root = tk.Tk()
-            root.withdraw()  # Hide main window
+            root.withdraw()
             messagebox.showerror("Error", 
-                               f"Quantized model file '{model_file}' not found!\\n\\n"
+                               f"Quantized model file '{model_file}' not found!\n\n"
                                "Please ensure the quantized TFLite model file is in the correct location.")
             return
         else:
             sys.exit(1)
     
-    # Print startup information
     print("🚀 Starting Brain Tumor Detection App with TFLite Runtime")
     print(f"📄 Model: {model_file}")
     if args.delegate:
@@ -567,17 +510,12 @@ def main():
     else:
         print("💻 Running CPU-only mode")
     
-    # Create and run application
     root = tk.Tk()
-    
-    # Create app with delegate path
     app = BrainTumorDetectionApp(root, delegate_path=args.delegate)
     
-    # Update model path if specified
     if args.model != 'brain_tumor_fully_quantized_int8.tflite':
         app.model_path = model_file
     
-    # Center window on screen
     root.update_idletasks()
     x = (root.winfo_screenwidth() // 2) - (root.winfo_width() // 2)
     y = (root.winfo_screenheight() // 2) - (root.winfo_height() // 2)
@@ -588,3 +526,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
