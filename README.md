@@ -32,7 +32,7 @@ This repository is **optimized for deployment** on the NXP-based **phyBOARD-Poll
 | 08 | [🖐️ Gesture Detection](./08-gesture_detection) | Detects hand gestures 
 | 09 | [🚗 Driver Monitoring System](./09-driver_monitoring_system) | Detects eye-closure and yawning
 | 10 | [🛣️ Lane Detection](./10-lane_detection) | Highway road lane detection
-
+| 11 | [🧠 Brain Tumor Detection System](./11-Brain-Tumor-Detection-System) | Brain tumor detection on MRI images
 
 ---
 
