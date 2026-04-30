@@ -1,6 +1,6 @@
 
 
-# 📌 PCB Defect Detection (YOLOv8 TFLite + NPU)
+# 🕵 PCB Defect Detection (YOLOv8 TFLite + NPU)
 
 A lightweight **real-time PCB defect detection system** built using a **YOLOv8 TFLite (INT8 quantized) model** with optional **NPU acceleration**.
 
@@ -25,11 +25,8 @@ The application also displays:
 
 ## 🖼️ Output Example
 
-> Replace with your actual screenshot
-
-```
 ![Demo Image](output.png)
-```
+
 
 ---
 

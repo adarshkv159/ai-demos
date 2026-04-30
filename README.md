@@ -33,6 +33,7 @@ This repository is **optimized for deployment** on the NXP-based **phyBOARD-Poll
 | 09 | [🚗 Driver Monitoring System](./09-driver_monitoring_system) | Detects eye-closure and yawning
 | 10 | [🛣️ Lane Detection](./10-lane_detection) | Highway road lane detection
 | 11 | [🧠 Brain Tumor Detection System](./11-Brain-Tumor-Detection-System) | Brain tumor detection on MRI images
+| 12 | [🕵 PCB Defect Detection System](./12-pcb_defect_detection) | real-time PCB defect detection system built using a YOLOv8
 
 ---
 
