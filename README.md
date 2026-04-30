@@ -34,7 +34,7 @@ This repository is **optimized for deployment** on the NXP-based **phyBOARD-Poll
 | 10 | [🛣️ Lane Detection](./10-lane_detection) | Highway road lane detection
 | 11 | [🧠 Brain Tumor Detection System](./11-Brain-Tumor-Detection-System) | Brain tumor detection on MRI images
 | 12 | [🕵 PCB Defect Detection System](./12-pcb_defect_detection) | real-time PCB defect detection system built using a YOLOv8
-
+| 13 | [🎥 Monocular Depth Perception with Real-Time 3D ](./13-EmbedDepth) | Edge-Accelerated Monocular Depth Perception with Real-Time 3D Point Cloud Visualization on Embedded NPU
 ---
 
 ## ⚙️ Features
