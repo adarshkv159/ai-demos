@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>MiDaS v2.1 Small — Point Cloud Studio</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#000;font-family:'Courier New',monospace;overflow:hidden;color:#0ff}
+#app{width:100vw;height:100vh;display:flex;flex-direction:column}
+
+/* ── toolbar ── */
+#toolbar{
+  display:flex;align-items:center;gap:10px;padding:7px 12px;
+  background:#050510;border-bottom:1px solid #0ff3;
+  flex-shrink:0;flex-wrap:wrap;
+}
+#toolbar h1{font-size:11px;letter-spacing:4px;color:#0ff;text-shadow:0 0 10px #0ff;margin-right:2px}
+.sep{width:1px;height:26px;background:#0ff2;flex-shrink:0}
+.tbtn{font-family:'Courier New',monospace;font-size:9px;letter-spacing:1.5px;
+  padding:5px 10px;border:1px solid currentColor;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tbtn.cyan{color:#000;background:#0ff;border-color:#0ff}
+.tbtn.cyan:hover{background:#fff}
+.tbtn.out{color:#0ff;background:transparent;border-color:#0ff3}
+.tbtn.out:hover{background:#0ff1;border-color:#0ff}
+.tbtn.red{color:#000;background:#ff2d78;border-color:#ff2d78}
+.tbtn.red:hover{background:#ff6a9b}
+.tbtn.grn{color:#000;background:#0f9;border-color:#0f9}
+.tbtn.grn:hover{background:#5fffc5}
+.tbtn.yel{color:#000;background:#ff0;border-color:#ff0}
+.tbtn.yel:hover{background:#fff}
+.tbtn:disabled{opacity:.3;pointer-events:none}
+#model-lbl{font-size:8px;color:#0a8;letter-spacing:1px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#status-bar{font-size:8px;letter-spacing:1px;color:#0a8;margin-left:auto;white-space:nowrap}
+
+/* capture badge */
+#capture-badge{
+  display:none;align-items:center;gap:6px;
+  background:#ff2d7822;border:1px solid #ff2d78;padding:3px 10px;
+  font-size:8px;letter-spacing:2px;color:#ff2d78;
+}
+#capture-badge.visible{display:flex}
+#capture-badge .dot{width:6px;height:6px;border-radius:50%;background:#ff2d78;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── main ── */
+#main{flex:1;display:flex;overflow:hidden;min-height:0}
+#three-wrap{flex:1;position:relative;min-width:0}
+#three-canvas{width:100%;height:100%;display:block}
+
+/* ── left edit panel (shape controls) ── */
+#edit-panel{
+  width:200px;flex-shrink:0;border-right:1px solid #0ff2;
+  background:#020208;display:flex;flex-direction:column;overflow-y:auto;
+  transition:margin-left .3s;
+}
+#edit-panel.hidden{margin-left:-200px}
+.ep-section{border-bottom:1px solid #0ff2;padding:8px 10px}
+.ep-title{font-size:8px;letter-spacing:3px;color:#0ff;margin-bottom:8px;text-transform:uppercase}
+.ep-row{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+.ep-row label{font-size:8px;letter-spacing:1.5px;color:#456;display:flex;justify-content:space-between}
+.ep-row label span{color:#0ff}
+.ep-row input[type=range]{width:100%;accent-color:#0ff;height:2px;cursor:pointer}
+.ep-row select{width:100%;background:#0a0a18;color:#0ff;border:1px solid #0ff3;
+  font-family:'Courier New',monospace;font-size:8px;padding:3px 4px;cursor:pointer}
+.reset-btn{width:100%;font-family:'Courier New',monospace;font-size:8px;letter-spacing:2px;
+  padding:4px;border:1px solid #0ff3;color:#456;background:transparent;cursor:pointer;margin-top:4px}
+.reset-btn:hover{color:#0ff;border-color:#0ff}
+
+/* ── right info panel ── */
+#panel{width:200px;flex-shrink:0;border-left:1px solid #0ff2;background:#020208;display:flex;flex-direction:column;overflow:hidden}
+.pb{border-bottom:1px solid #0ff2;padding:7px}
+.ph{font-size:8px;letter-spacing:2px;color:#456;margin-bottom:4px}
+#cam-canvas,#depth-canvas{width:100%;display:block}
+#captures-list{flex:1;overflow-y:auto;padding:6px}
+.cap-thumb{
+  display:flex;gap:6px;align-items:center;
+  padding:5px;margin-bottom:4px;border:1px solid #0ff2;cursor:pointer;
+  transition:border-color .15s;
+}
+.cap-thumb:hover{border-color:#0ff}
+.cap-thumb.active{border-color:#ff2d78}
+.cap-thumb canvas{width:60px;height:34px;flex-shrink:0;display:block}
+.cap-info{font-size:8px;color:#456;letter-spacing:.5px;line-height:1.7}
+.cap-info .cn{color:#0ff;font-size:9px}
+
+/* ── HUD ── */
+#hud{position:absolute;top:10px;left:10px;pointer-events:none;font-size:9px;line-height:2;letter-spacing:1px;text-shadow:0 0 6px #0ff;z-index:5}
+#hud .lb{color:#456;margin-right:4px}
+#mode-badge{
+  position:absolute;top:10px;right:10px;z-index:5;pointer-events:none;
+  font-size:9px;letter-spacing:3px;padding:4px 10px;border:1px solid;
+}
+#mode-badge.live{color:#0ff;border-color:#0ff3;background:#0ff1;text-shadow:0 0 8px #0ff}
+#mode-badge.frozen{color:#ff2d78;border-color:#ff2d784a;background:#ff2d7811}
+
+/* ── axis ── */
+#axis-canvas{position:absolute;bottom:10px;left:10px;pointer-events:none;opacity:.65;z-index:5}
+
+/* ── overlay ── */
+#overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(0,0,10,.94);z-index:30;gap:14px;text-align:center;padding:30px}
+#overlay.gone{display:none}
+.ov-big{font-size:16px;letter-spacing:6px;color:#0ff;text-shadow:0 0 24px #0ff}
+.ov-sub{font-size:8px;color:#456;letter-spacing:2px;line-height:2;max-width:360px}
+.ov-err{font-size:9px;color:#ff2d78;letter-spacing:1px;max-width:400px;line-height:1.8;min-height:16px}
+.ov-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.ov-step{display:flex;flex-direction:column;align-items:center;gap:5px}
+.ov-step button{font-family:'Courier New',monospace;font-size:9px;letter-spacing:3px;padding:10px 22px;background:#0ff;color:#000;border:none;cursor:pointer}
+.ov-step button:hover{background:#fff}
+.ov-step .note{font-size:7px;color:#456;letter-spacing:2px}
+
+/* ── image source badge ── */
+#img-badge{
+  display:none;align-items:center;gap:6px;
+  background:#ffe60022;border:1px solid #ffe600;padding:3px 10px;
+  font-size:8px;letter-spacing:2px;color:#ffe600;
+}
+#img-badge.visible{display:flex}
+
+/* ── save modal ── */
+#save-modal{
+  position:absolute;inset:0;z-index:40;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,10,.88);
+}
+#save-modal.gone{display:none}
+#save-box{
+  background:#050510;border:1px solid #0ff4;padding:24px 30px;
+  display:flex;flex-direction:column;gap:14px;min-width:280px;
+}
+#save-box h2{font-size:10px;letter-spacing:4px;color:#0ff}
+.save-row{display:flex;flex-direction:column;gap:4px}
+.save-row label{font-size:8px;letter-spacing:2px;color:#456}
+.save-row input[type=text]{background:#0a0a18;color:#0ff;border:1px solid #0ff3;
+  font-family:'Courier New',monospace;font-size:10px;padding:5px 8px;width:100%}
+.save-btns{display:flex;gap:8px;flex-wrap:wrap}
+.save-btns button{flex:1;font-family:'Courier New',monospace;font-size:8px;letter-spacing:2px;
+  padding:8px 6px;border:1px solid currentColor;cursor:pointer}
+.sb-png{color:#000;background:#0ff;border-color:#0ff}
+.sb-ply{color:#000;background:#0f9;border-color:#0f9}
+.sb-json{color:#000;background:#ff0;border-color:#ff0}
+.sb-cancel{color:#456;background:transparent;border-color:#333}
+.sb-cancel:hover{color:#0ff;border-color:#0ff}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ── TOOLBAR ── -->
+<div id="toolbar">
+  <h1>MIDAS V2.1 SMALL</h1>
+
+  <!-- Server status indicator -->
+  <div id="server-status" style="display:flex;align-items:center;gap:6px;padding:3px 10px;border:1px solid #0ff3;font-size:8px;letter-spacing:2px;color:#456">
+    <div id="srv-dot" style="width:6px;height:6px;border-radius:50%;background:#456"></div>
+    <span id="srv-lbl">CONNECTING…</span>
+  </div>
+
+  <!-- NPU / CPU toggle -->
+  <button id="npu-btn" class="tbtn out" onclick="toggleBackend()" title="Switch NPU ↔ CPU">⚡ NPU</button>
+  <span id="model-lbl">no model</span>
+
+  <div class="sep"></div>
+  <button id="cam-btn" class="tbtn cyan" onclick="toggleCam()">▶ START CAM</button>
+  <input type="file" id="img-file" accept="image/*" style="display:none" onchange="loadImageFile(event)">
+  <button class="tbtn out" onclick="document.getElementById('img-file').click()">🖼 LOAD IMAGE</button>
+  <div id="img-badge">🖼 IMAGE MODE</div>
+
+  <div class="sep"></div>
+  <!-- CAPTURE button — freezes current frame into edit mode -->
+  <button id="capture-btn" class="tbtn red" onclick="captureFrame()" disabled>📸 CAPTURE</button>
+  <div id="capture-badge"><div class="dot"></div>FROZEN — EDIT MODE</div>
+  <button id="resume-btn" class="tbtn out" onclick="resumeLive()" style="display:none">▶ RESUME LIVE</button>
+
+  <div class="sep"></div>
+  <!-- Shape panel toggle -->
+  <button id="shape-btn" class="tbtn out" onclick="toggleEditPanel()">⚙ SHAPE</button>
+
+  <div class="sep"></div>
+  <!-- Save -->
+  <button id="save-btn" class="tbtn grn" onclick="openSaveModal()" disabled>💾 SAVE</button>
+
+  <div id="status-bar">IDLE — load tflite model first</div>
+</div>
+
+<!-- ── MAIN ── -->
+<div id="main">
+
+  <!-- Left: shape edit panel -->
+  <div id="edit-panel" class="hidden">
+
+    <div class="ep-section">
+      <div class="ep-title">📐 Point Cloud</div>
+      <div class="ep-row">
+        <label>Density <span id="lv-density">4</span></label>
+        <input type="range" id="sl-density" min="1" max="8" value="4" step="1" oninput="slv('density');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Point Size <span id="lv-ptsize">2</span></label>
+        <input type="range" id="sl-ptsize" min="0.5" max="8" value="2" step="0.1" oninput="slv('ptsize');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Colormap</label>
+        <select id="sl-cmap" onchange="rebuildFrozen()">
+          <option value="inferno">INFERNO</option>
+          <option value="viridis">VIRIDIS</option>
+          <option value="plasma">PLASMA</option>
+          <option value="magma">MAGMA</option>
+          <option value="rgb">RGB (webcam)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="ep-section">
+      <div class="ep-title">🌊 Depth Shape</div>
+      <div class="ep-row">
+        <label>Z Scale <span id="lv-zscale">3</span></label>
+        <input type="range" id="sl-zscale" min="0.1" max="12" value="3" step="0.1" oninput="slv('zscale');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Depth Min clip <span id="lv-dmin">0</span></label>
+        <input type="range" id="sl-dmin" min="0" max="0.9" value="0" step="0.01" oninput="slv('dmin');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Depth Max clip <span id="lv-dmax">1</span></label>
+        <input type="range" id="sl-dmax" min="0.1" max="1" value="1" step="0.01" oninput="slv('dmax');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Threshold (hide) <span id="lv-thresh">0</span></label>
+        <input type="range" id="sl-thresh" min="0" max="0.95" value="0" step="0.01" oninput="slv('thresh');rebuildFrozen()">
+      </div>
+    </div>
+
+    <div class="ep-section">
+      <div class="ep-title">🔧 Deform</div>
+      <div class="ep-row">
+        <label>Taper X <span id="lv-taper">0</span></label>
+        <input type="range" id="sl-taper" min="-2" max="2" value="0" step="0.05" oninput="slv('taper');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Twist (deg/unit) <span id="lv-twist">0</span></label>
+        <input type="range" id="sl-twist" min="-180" max="180" value="0" step="1" oninput="slv('twist');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Wave Amp <span id="lv-wamp">0</span></label>
+        <input type="range" id="sl-wamp" min="0" max="2" value="0" step="0.05" oninput="slv('wamp');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Wave Freq <span id="lv-wfreq">4</span></label>
+        <input type="range" id="sl-wfreq" min="0.5" max="20" value="4" step="0.5" oninput="slv('wfreq');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Noise <span id="lv-noise">0</span></label>
+        <input type="range" id="sl-noise" min="0" max="0.5" value="0" step="0.01" oninput="slv('noise');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Spherize <span id="lv-sphere">0</span></label>
+        <input type="range" id="sl-sphere" min="0" max="1" value="0" step="0.01" oninput="slv('sphere');rebuildFrozen()">
+      </div>
+    </div>
+
+    <div class="ep-section">
+      <div class="ep-title">🎨 Style</div>
+      <div class="ep-row">
+        <label>Brightness <span id="lv-bright">1</span></label>
+        <input type="range" id="sl-bright" min="0.1" max="3" value="1" step="0.05" oninput="slv('bright');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Contrast <span id="lv-contrast">1</span></label>
+        <input type="range" id="sl-contrast" min="0.1" max="4" value="1" step="0.05" oninput="slv('contrast');rebuildFrozen()">
+      </div>
+      <div class="ep-row">
+        <label>Opacity <span id="lv-opacity">0.95</span></label>
+        <input type="range" id="sl-opacity" min="0.05" max="1" value="0.95" step="0.01" oninput="slv('opacity');rebuildFrozen()">
+      </div>
+    </div>
+
+    <div class="ep-section">
+      <button class="reset-btn" onclick="resetAllParams()">↺ RESET ALL PARAMETERS</button>
+    </div>
+  </div>
+
+  <!-- Centre: THREE.js canvas -->
+  <div id="three-wrap">
+    <canvas id="three-canvas"></canvas>
+
+    <div id="hud">
+      <div><span class="lb">FPS</span><span id="h-fps">--</span></div>
+      <div><span class="lb">POINTS</span><span id="h-pts">--</span></div>
+      <div><span class="lb">INFERENCE</span><span id="h-inf">--</span></div>
+      <div><span class="lb">CAPTURES</span><span id="h-caps">0</span></div>
+    </div>
+
+    <div id="mode-badge" class="live">LIVE</div>
+    <canvas id="axis-canvas" width="54" height="54"></canvas>
+
+    <!-- Overlay -->
+    <div id="overlay">
+      <div class="ov-big">MIDAS V2.1 SMALL STUDIO</div>
+      <div class="ov-sub">
+        REAL-TIME 3D POINT CLOUD + CAPTURE + EDIT + SAVE<br>
+        frame → Python server (TFLite INT8 / NPU) → depth → 3D points → edit → export
+      </div>
+      <div class="ov-err" id="ov-err"></div>
+      <div class="ov-actions">
+        <div class="ov-step">
+          <button onclick="checkServer()">STEP 1 — CHECK SERVER</button>
+          <div class="note">python3 server.py</div>
+        </div>
+        <div class="ov-step">
+          <button id="ov-cam-btn" onclick="ovStartCam()" style="opacity:.5;pointer-events:none">STEP 2 — START CAMERA</button>
+          <div class="note">requires server running</div>
+        </div>
+        <div class="ov-step">
+          <button id="ov-img-btn" onclick="document.getElementById('img-file').click()" style="opacity:.5;pointer-events:none">STEP 2B — LOAD IMAGE</button>
+          <div class="note">jpg / png instead of webcam</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: captures + previews -->
+  <div id="panel">
+    <div class="pb">
+      <div class="ph">RAW INPUT</div>
+      <canvas id="cam-canvas" height="110"></canvas>
+    </div>
+    <div class="pb">
+      <div class="ph">DEPTH MAP</div>
+      <canvas id="depth-canvas" height="110"></canvas>
+    </div>
+    <div class="pb" style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+      <div class="ph">CAPTURES (<span id="cap-count">0</span>)</div>
+      <div id="captures-list" style="flex:1;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Save modal -->
+<div id="save-modal" class="gone">
+  <div id="save-box">
+    <h2>EXPORT CAPTURE</h2>
+    <div class="save-row">
+      <label>FILENAME</label>
+      <input type="text" id="save-name" value="pointcloud_001">
+    </div>
+    <div class="save-row">
+      <label>FORMAT</label>
+    </div>
+    <div class="save-btns">
+      <button class="sb-png" onclick="savePNG()">🖼 PNG<br><span style="font-size:7px">screenshot</span></button>
+      <button class="sb-ply" onclick="savePLY()">📦 PLY<br><span style="font-size:7px">point cloud</span></button>
+      <button class="sb-json" onclick="saveJSON()">📄 JSON<br><span style="font-size:7px">raw data</span></button>
+    </div>
+    <div class="save-btns">
+      <button class="sb-cancel" onclick="closeSaveModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════
+//  COLORMAPS
+// ═══════════════════════════════════════════════════════════════
+const MAPS={
+  inferno:[[0,0,4],[40,11,84],[101,21,110],[159,42,99],[212,72,66],[245,125,21],[252,191,66],[252,255,164]],
+  viridis:[[68,1,84],[72,40,120],[62,83,160],[49,118,178],[38,152,186],[31,183,181],[53,213,158],[109,235,113],[180,249,72],[253,231,37]],
+  plasma:[[13,8,135],[75,3,161],[125,3,168],[168,34,150],[203,70,121],[229,107,93],[248,148,65],[253,187,40],[240,249,33]],
+  magma:[[0,0,4],[28,16,68],[79,18,123],[129,37,129],[181,54,122],[229,80,100],[251,135,97],[254,194,135],[252,253,191]]
+};
+function applyColormap(t,name){
+  const m=MAPS[name];if(!m)return[t,t,t];
+  t=Math.max(0,Math.min(1,t));
+  const fi=t*(m.length-1),lo=fi|0,hi=Math.min(lo+1,m.length-1),f=fi-lo;
+  return[(m[lo][0]+(m[hi][0]-m[lo][0])*f)/255,
+         (m[lo][1]+(m[hi][1]-m[lo][1])*f)/255,
+         (m[lo][2]+(m[hi][2]-m[lo][2])*f)/255];
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  THREE.JS
+// ═══════════════════════════════════════════════════════════════
+const tc=document.getElementById('three-canvas');
+const renderer=new THREE.WebGLRenderer({canvas:tc,antialias:false,preserveDrawingBuffer:true});
+renderer.setClearColor(0x000000,1);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+
+const scene=new THREE.Scene();
+scene.add(new THREE.GridHelper(4,20,0x0b0b1c,0x0b0b1c));
+
+const camera=new THREE.PerspectiveCamera(55,1,0.001,500);
+let sph={t:0.4,p:1.1,r:4.5};
+function syncCam(){
+  camera.position.set(
+    sph.r*Math.sin(sph.p)*Math.sin(sph.t),
+    sph.r*Math.cos(sph.p),
+    sph.r*Math.sin(sph.p)*Math.cos(sph.t)
+  );
+  camera.lookAt(0,0,0);
+}
+
+const MAX=256*256;
+const pArr=new Float32Array(MAX*3);
+const cArr=new Float32Array(MAX*3);
+const pcGeo=new THREE.BufferGeometry();
+pcGeo.setAttribute('position',new THREE.BufferAttribute(pArr,3));
+pcGeo.setAttribute('color',   new THREE.BufferAttribute(cArr,3));
+pcGeo.setDrawRange(0,0);
+const pcMat=new THREE.PointsMaterial({size:0.012,vertexColors:true,sizeAttenuation:true,transparent:true,opacity:0.95});
+scene.add(new THREE.Points(pcGeo,pcMat));
+
+// Orbit
+let drag=false,lp={x:0,y:0};
+tc.addEventListener('mousedown',e=>{drag=true;lp={x:e.clientX,y:e.clientY};e.preventDefault()});
+window.addEventListener('mouseup',()=>drag=false);
+window.addEventListener('mousemove',e=>{
+  if(!drag)return;
+  sph.t-=(e.clientX-lp.x)*0.006;sph.p+=(e.clientY-lp.y)*0.006;
+  sph.p=Math.max(0.05,Math.min(Math.PI-0.05,sph.p));lp={x:e.clientX,y:e.clientY};
+});
+tc.addEventListener('wheel',e=>{sph.r=Math.max(0.5,Math.min(15,sph.r+e.deltaY*0.006));},{passive:true});
+let ltd=null;
+tc.addEventListener('touchstart',e=>{
+  e.preventDefault();
+  if(e.touches.length===1){drag=true;lp={x:e.touches[0].clientX,y:e.touches[0].clientY};}
+  else ltd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+},{passive:false});
+window.addEventListener('touchend',()=>{drag=false;ltd=null;});
+window.addEventListener('touchmove',e=>{
+  if(e.touches.length===1&&drag){
+    sph.t-=(e.touches[0].clientX-lp.x)*0.007;sph.p+=(e.touches[0].clientY-lp.y)*0.007;
+    sph.p=Math.max(0.05,Math.min(Math.PI-0.05,sph.p));lp={x:e.touches[0].clientX,y:e.touches[0].clientY};
+  }else if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(ltd)sph.r=Math.max(0.5,Math.min(15,sph.r-(d-ltd)*0.012));ltd=d;
+  }
+},{passive:true});
+
+// Axis
+const axC=document.getElementById('axis-canvas');
+const axR=new THREE.WebGLRenderer({canvas:axC,alpha:true,antialias:true});
+axR.setSize(54,54);axR.setClearColor(0,0);
+const axS=new THREE.Scene();axS.add(new THREE.AxesHelper(1));
+const axCam=new THREE.PerspectiveCamera(40,1,0.01,100);
+
+function onResize(){
+  const w=tc.clientWidth,h=tc.clientHeight;
+  renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+}
+new ResizeObserver(onResize).observe(tc);onResize();
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ── Server config ─────────────────────────────────────────────
+const SERVER = 'http://localhost:5001';
+let serverOk = false;
+let npuActive = false;
+
+// ── Poll server status on load ────────────────────────────────
+async function checkServer(){
+  try{
+    const r = await fetch(SERVER+'/status');
+    const d = await r.json();
+    serverOk = d.ok;
+    npuActive = d.npu;
+    updateServerBadge(d);
+    if(serverOk){
+      setStatus('SERVER OK — '+(npuActive?'NPU ✅':'CPU')+'  model: '+d.model);
+      document.getElementById('ov-cam-btn').style.cssText='opacity:1;pointer-events:auto';
+      document.getElementById('ov-img-btn').style.cssText='opacity:1;pointer-events:auto';
+      hideOverlay();
+    } else {
+      showErr('Server responded but model not loaded. Check server.py console.');
+    }
+  }catch(e){
+    serverOk=false;
+    updateServerBadge(null);
+    showErr('Cannot reach server at '+SERVER+' — run: python3 server.py');
+    setStatus('SERVER OFFLINE');
+  }
+}
+
+function updateServerBadge(d){
+  const dot=document.getElementById('srv-dot');
+  const lbl=document.getElementById('srv-lbl');
+  const btn=document.getElementById('npu-btn');
+  if(!d){
+    dot.style.background='#ff2d78';lbl.textContent='OFFLINE';
+    btn.className='tbtn out';btn.style.opacity='0.4';
+    return;
+  }
+  dot.style.background= d.npu ? '#0f9' : '#0ff';
+  lbl.textContent = d.npu ? 'NPU ✅' : 'CPU';
+  btn.textContent = d.npu ? '⚡ NPU' : '🖥 CPU';
+  btn.className   = d.npu ? 'tbtn grn' : 'tbtn out';
+  btn.style.opacity = d.npu_available || !d.npu ? '1' : '0.5';
+  document.getElementById('model-lbl').textContent = d.model ? d.model.split('/').pop() : 'loaded';
+  btn.title = d.npu_available
+    ? (d.npu ? 'Switch to CPU' : 'Switch to NPU')
+    : 'NPU not available on this device';
+}
+
+async function toggleBackend(){
+  if(!serverOk){checkServer();return;}
+  try{
+    const r=await fetch(SERVER+'/set_backend',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({npu:!npuActive})
+    });
+    const d=await r.json();
+    npuActive=d.npu;
+    updateServerBadge(d);
+    setStatus('Backend → '+(d.npu?'NPU ✅':'CPU'));
+  }catch(e){setStatus('Backend switch failed: '+e.message);}
+}
+
+// Auto-check server on page load
+window.addEventListener('load',()=>setTimeout(checkServer,400));
+
+
+let video=null,offCvs=null,offCtx=null;
+let running=false,busy=false,rafId=null;
+let frozen=false;            // true = capture mode
+let frozenDepth=null;        // Float32Array depth of captured frame
+let frozenPixels=null;       // Uint8ClampedArray RGBA 256×256
+let captures=[];             // array of {depth, pixels, thumb}
+let activeCapIdx=-1;
+
+const camCvs=document.getElementById('cam-canvas');
+const depCvs=document.getElementById('depth-canvas');
+const camCtx=camCvs.getContext('2d');
+const depCtx=depCvs.getContext('2d');
+let fcount=0,lastFT=performance.now();
+
+// ═══════════════════════════════════════════════════════════════
+//  SLIDER helpers
+// ═══════════════════════════════════════════════════════════════
+function slv(id){
+  const el=document.getElementById('sl-'+id);
+  document.getElementById('lv-'+id).textContent=el.value;
+}
+function gv(id){return parseFloat(document.getElementById('sl-'+id).value);}
+function gi(id){return parseInt(document.getElementById('sl-'+id).value);}
+function gs(id){return document.getElementById('sl-'+id).value;}
+
+const DEFAULTS={density:4,ptsize:2,zscale:3,dmin:0,dmax:1,thresh:0,
+  taper:0,twist:0,wamp:0,wfreq:4,noise:0,sphere:0,bright:1,contrast:1,opacity:0.95};
+
+function resetAllParams(){
+  for(const [k,v] of Object.entries(DEFAULTS)){
+    const el=document.getElementById('sl-'+k);
+    if(el){el.value=v;document.getElementById('lv-'+k).textContent=v;}
+  }
+  rebuildFrozen();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MODEL LOAD
+// ═══════════════════════════════════════════════════════════════
+// model loaded server-side — no file input needed
+
+
+// ═══════════════════════════════════════════════════════════════
+//  IMAGE FILE INPUT — load any jpg/png, run TFLite, enter edit mode
+// ═══════════════════════════════════════════════════════════════
+async function loadImageFile(evt){
+  const file=evt.target.files[0];evt.target.value='';
+  if(!file)return;
+  if(!serverOk){showErr('Server not connected — run: python3 server.py');return;}
+
+  // Stop live camera if running
+  if(running)stopCam();
+
+  setStatus('LOADING IMAGE…');
+  hideOverlay();
+
+  // Decode image via an <img> element
+  const img=new Image();
+  img.src=URL.createObjectURL(file);
+  await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;});
+  URL.revokeObjectURL(img.src);
+
+  // Draw into 256×256 offscreen canvas — same size webcam.py uses
+  const tmpCvs=document.createElement('canvas');
+  tmpCvs.width=256;tmpCvs.height=256;
+  const tmpCtx=tmpCvs.getContext('2d',{willReadFrequently:true});
+  tmpCtx.drawImage(img,0,0,256,256);
+  const imgData=tmpCtx.getImageData(0,0,256,256);
+  const px=imgData.data;
+
+  // Show in cam preview panel
+  camCvs.width=186;camCvs.height=110;
+  camCtx.drawImage(tmpCvs,0,0,186,110);
+  depCvs.width=186;depCvs.height=110;
+
+  // Run TFLite inference on image
+  setStatus('RUNNING TFLITE ON IMAGE…');
+  try{
+    const t0=performance.now();
+    const depth=await runTFLiteInference(px);
+    const t1=performance.now();
+    document.getElementById('h-inf').textContent=Math.round(t1-t0)+'ms';
+
+    // Store as frozen frame — same as a webcam capture
+    frozenDepth=depth;
+    frozenPixels=new Uint8ClampedArray(px);
+    frozen=true;
+
+    updateDepthPreview(depth,256,256,px);
+    buildPointCloud(depth,256,256,px);
+
+    // Show image-mode badge
+    document.getElementById('img-badge').classList.add('visible');
+    document.getElementById('capture-badge').classList.remove('visible');
+    document.getElementById('resume-btn').style.display='none';
+    document.getElementById('capture-btn').disabled=true;  // no "capture" in image mode
+    document.getElementById('save-btn').disabled=false;
+    setModeBadge('frozen');
+    setStatus('IMAGE LOADED: '+file.name+' — adjust shape params freely');
+    saveCounter++;
+    document.getElementById('save-name').value=file.name.replace(/\.[^.]+$/,'')+'_pointcloud';
+
+    // Render once
+    syncCam();renderer.render(scene,camera);
+  }catch(err){
+    setStatus('INFERENCE ERROR: '+err.message);
+    showErr(err.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CAMERA
+// ═══════════════════════════════════════════════════════════════
+async function startCam(){
+  if(!serverOk){showErr('Server not connected — run: python3 server.py');return;}
+  setStatus('REQUESTING CAMERA…');
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720}},audio:false});
+    video=document.createElement('video');
+    Object.assign(video.style,{position:'fixed',top:'-9999px',left:'-9999px',width:'1px',height:'1px',opacity:'0',pointerEvents:'none'});
+    document.body.appendChild(video);
+    video.srcObject=stream;video.muted=true;video.playsInline=true;
+    await video.play();
+    await new Promise((res,rej)=>{
+      let tries=0;
+      const t=setInterval(()=>{
+        if(video.readyState>=3&&video.videoWidth>0){clearInterval(t);res();}
+        if(++tries>100){clearInterval(t);rej(new Error('Video timeout'));}
+      },50);
+    });
+    offCvs=document.createElement('canvas');offCvs.width=256;offCvs.height=256;
+    offCtx=offCvs.getContext('2d',{willReadFrequently:true});
+    camCvs.width=186;camCvs.height=110;depCvs.width=186;depCvs.height=110;
+    running=true;frozen=false;
+    document.getElementById('cam-btn').textContent='■ STOP CAM';
+    document.getElementById('cam-btn').className='tbtn red';
+    document.getElementById('capture-btn').disabled=false;
+    document.getElementById('img-badge').classList.remove('visible');
+    hideOverlay();setStatus('RUNNING');
+    setModeBadge('live');
+    mainLoop();
+  }catch(err){
+    setStatus('CAM ERROR: '+err.message);showErr(err.message);
+    if(video){video.remove();video=null;}
+  }
+}
+
+function stopCam(){
+  running=false;frozen=false;
+  if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+  if(video){
+    if(video.srcObject)video.srcObject.getTracks().forEach(t=>t.stop());
+    video.pause();video.remove();video=null;
+  }
+  pcGeo.setDrawRange(0,0);
+  document.getElementById('cam-btn').textContent='▶ START CAM';
+  document.getElementById('cam-btn').className='tbtn cyan';
+  document.getElementById('capture-btn').disabled=true;
+  document.getElementById('capture-badge').classList.remove('visible');
+  document.getElementById('resume-btn').style.display='none';
+  document.getElementById('img-badge').classList.remove('visible');
+  document.getElementById('save-btn').disabled=true;
+  setModeBadge('live');setStatus('STOPPED');
+}
+
+async function toggleCam(){
+  if(running){stopCam();return;}
+  if(!serverOk){showErr('Server not connected — run: python3 server.py');return;}
+  await startCam();
+}
+async function ovStartCam(){hideOverlay();await startCam();}
+
+// ═══════════════════════════════════════════════════════════════
+//  CAPTURE — freeze current frame for editing
+// ═══════════════════════════════════════════════════════════════
+function captureFrame(){
+  if(!running||!frozenDepth)return;
+
+  // Store snapshot
+  const snap={
+    depth:new Float32Array(frozenDepth),
+    pixels:new Uint8ClampedArray(frozenPixels),
+    params:getCurrentParams(),
+    timestamp:new Date().toLocaleTimeString()
+  };
+
+  // Render thumb
+  const th=document.createElement('canvas');th.width=60;th.height=34;
+  const tCtx=th.getContext('2d');
+  const id=tCtx.createImageData(60,34);
+  const d=id.data;
+  const cmap=gs('cmap');
+  for(let y=0;y<34;y++){
+    for(let x=0;x<60;x++){
+      const sx=Math.floor(x*256/60),sy=Math.floor(y*256/34);
+      const v=snap.depth[sy*256+sx];
+      let r2,g2,b2;
+      if(cmap==='rgb'){const si=(sy*256+sx)*4;r2=snap.pixels[si];g2=snap.pixels[si+1];b2=snap.pixels[si+2];}
+      else{const c=applyColormap(v,cmap);r2=c[0]*255;g2=c[1]*255;b2=c[2]*255;}
+      const i=(y*60+x)*4;d[i]=r2;d[i+1]=g2;d[i+2]=b2;d[i+3]=255;
+    }
+  }
+  tCtx.putImageData(id,0,0);
+  snap.thumb=th;
+  captures.push(snap);
+
+  // Enter frozen/edit mode with this capture
+  frozen=true;
+  frozenDepth=snap.depth;
+  frozenPixels=snap.pixels;
+  activeCapIdx=captures.length-1;
+
+  document.getElementById('capture-badge').classList.add('visible');
+  document.getElementById('resume-btn').style.display='';
+  document.getElementById('save-btn').disabled=false;
+  setModeBadge('frozen');
+  renderCapturesList();
+  rebuildFrozen();
+  setStatus(`CAPTURED #${captures.length} — edit mode active`);
+  document.getElementById('h-caps').textContent=captures.length;
+  document.getElementById('cap-count').textContent=captures.length;
+  saveCounter++;
+  document.getElementById('save-name').value='pointcloud_'+String(saveCounter).padStart(3,'0');
+}
+
+function resumeLive(){
+  frozen=false;
+  document.getElementById('capture-badge').classList.remove('visible');
+  document.getElementById('resume-btn').style.display='none';
+  document.getElementById('save-btn').disabled=captures.length===0;
+  setModeBadge('live');
+  setStatus('LIVE');
+  activeCapIdx=-1;
+  renderCapturesList();
+}
+
+function loadCapture(idx){
+  const snap=captures[idx];if(!snap)return;
+  frozen=true;
+  frozenDepth=snap.depth;
+  frozenPixels=snap.pixels;
+  activeCapIdx=idx;
+  // restore params
+  for(const[k,v] of Object.entries(snap.params)){
+    const el=document.getElementById('sl-'+k);
+    if(el){el.value=v;const lv=document.getElementById('lv-'+k);if(lv)lv.textContent=v;}
+  }
+  document.getElementById('capture-badge').classList.add('visible');
+  document.getElementById('resume-btn').style.display='';
+  document.getElementById('save-btn').disabled=false;
+  setModeBadge('frozen');
+  rebuildFrozen();
+  renderCapturesList();
+  setStatus(`EDITING CAPTURE #${idx+1}`);
+  document.getElementById('save-name').value='pointcloud_'+String(idx+1).padStart(3,'0');
+}
+
+function renderCapturesList(){
+  const list=document.getElementById('captures-list');
+  list.innerHTML='';
+  captures.forEach((snap,i)=>{
+    const div=document.createElement('div');
+    div.className='cap-thumb'+(i===activeCapIdx?' active':'');
+    div.onclick=()=>loadCapture(i);
+    div.appendChild(snap.thumb.cloneNode());
+    const info=document.createElement('div');
+    info.className='cap-info';
+    info.innerHTML=`<div class="cn">#${i+1}</div><div>${snap.timestamp}</div><div>${snap.params.density}px / ${snap.params.zscale}z</div>`;
+    div.appendChild(info);
+    list.appendChild(div);
+  });
+}
+
+function getCurrentParams(){
+  const keys=['density','ptsize','zscale','dmin','dmax','thresh','taper','twist','wamp','wfreq','noise','sphere','bright','contrast','opacity'];
+  const p={};
+  keys.forEach(k=>{const el=document.getElementById('sl-'+k);if(el)p[k]=el.value;});
+  p.cmap=gs('cmap');
+  return p;
+}
+
+let saveCounter=0;
+
+// ═══════════════════════════════════════════════════════════════
+//  MAIN LOOP
+// ═══════════════════════════════════════════════════════════════
+function mainLoop(){
+  if(!running)return;
+  rafId=requestAnimationFrame(mainLoop);
+  syncCam();
+  axCam.position.copy(camera.position).normalize().multiplyScalar(3);
+  axCam.lookAt(0,0,0);axR.render(axS,axCam);
+  renderer.render(scene,camera);
+  if(!frozen&&!busy){busy=true;runFrame().finally(()=>busy=false);}
+}
+;(function idle(){
+  requestAnimationFrame(idle);
+  if(!running){syncCam();renderer.render(scene,camera);}
+})();
+
+// ═══════════════════════════════════════════════════════════════
+//  LIVE FRAME PIPELINE (mirrors webcam.py)
+// ═══════════════════════════════════════════════════════════════
+async function runFrame(){
+  if(!video||video.readyState<3||video.videoWidth===0)return;
+  offCtx.drawImage(video,0,0,256,256);
+  const imgData=offCtx.getImageData(0,0,256,256);
+  const px=imgData.data;
+  camCtx.drawImage(offCvs,0,0,186,110);
+
+  const t0=performance.now();
+  const depth=await runTFLiteInference(px);
+  const t1=performance.now();
+  document.getElementById('h-inf').textContent=Math.round(t1-t0)+'ms';
+
+  // Keep latest frame ready for capture
+  frozenDepth=depth;
+  frozenPixels=new Uint8ClampedArray(px);
+
+  updateDepthPreview(depth,256,256,px);
+  buildPointCloud(depth,256,256,px);
+
+  fcount++;
+  const now=performance.now();
+  if(now-lastFT>=800){
+    document.getElementById('h-fps').textContent=Math.round(fcount*1000/(now-lastFT));
+    fcount=0;lastFT=now;
+  }
+}
+
+// Rebuild point cloud from frozen snapshot with current params
+function rebuildFrozen(){
+  if(!frozen||!frozenDepth)return;
+  buildPointCloud(frozenDepth,256,256,frozenPixels);
+  updateDepthPreview(frozenDepth,256,256,frozenPixels);
+  renderer.render(scene,camera);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INFERENCE — sends raw RGBA to Python server, gets depth back
+//  Server does: ImageNet norm → INT8 quant → TFLite invoke →
+//               dequant → min/max normalize → return float[256*256]
+// ═══════════════════════════════════════════════════════════════
+async function runTFLiteInference(rgba){
+  // rgba is Uint8ClampedArray [R,G,B,A, R,G,B,A, ...] 256×256×4
+  // Base64-encode and send to server
+  const bytes = new Uint8Array(rgba.buffer || rgba);
+  const b64   = btoa(String.fromCharCode(...bytes));
+
+  const r = await fetch(SERVER+'/infer',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({rgba:b64})
+  });
+  if(!r.ok) throw new Error('Inference server error: '+r.status);
+  const d = await r.json();
+  if(d.error) throw new Error(d.error);
+  return new Float32Array(d.depth);
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+//  BUILD POINT CLOUD — with all shape parameters
+// ═══════════════════════════════════════════════════════════════
+function buildPointCloud(depth,dW,dH,rgba256){
+  const step  = gi('density');
+  const zsc   = gv('zscale');
+  const cmap  = gs('cmap');
+  const ptsz  = gv('ptsize');
+  const dmin  = gv('dmin');
+  const dmax  = gv('dmax');
+  const thresh= gv('thresh');
+  const taper = gv('taper');
+  const twist = gv('twist') * Math.PI / 180;
+  const wamp  = gv('wamp');
+  const wfreq = gv('wfreq');
+  const noise = gv('noise');
+  const sphere= gv('sphere');
+  const bright= gv('bright');
+  const cont  = gv('contrast');
+  const opac  = gv('opacity');
+  const aspect= dW/dH;
+
+  let idx=0;
+  for(let py=0;py<dH;py+=step){
+    for(let px=0;px<dW;px+=step){
+      const di=py*dW+px;
+      let d=depth[di];
+
+      // Depth clip
+      if(d<dmin||d>dmax)continue;
+
+      // Threshold — hide background
+      if(d<thresh)continue;
+
+      // Remap clipped range to [0,1]
+      d=(d-dmin)/Math.max(dmax-dmin,1e-6);
+
+      // Base position (unproject pixel → 3D)
+      let x=(px/dW-0.5)*2.0*aspect;
+      let y=-(py/dH-0.5)*2.0;
+      let z=(d-0.5)*zsc;
+
+      // ── DEFORMATIONS ──────────────────────────────
+
+      // Taper: scale X by (1 + taper*z)
+      if(taper!==0) x*=(1+taper*z*0.5);
+
+      // Twist: rotate X,Y around Z axis by angle proportional to Z
+      if(twist!==0){
+        const ang=twist*z;
+        const cos=Math.cos(ang),sin=Math.sin(ang);
+        const nx=x*cos-y*sin,ny=x*sin+y*cos;
+        x=nx;y=ny;
+      }
+
+      // Wave (sine wave along Y offset by depth)
+      if(wamp>0){
+        z+=wamp*Math.sin(wfreq*x+wfreq*y);
+      }
+
+      // Noise (pseudo-random displacement)
+      if(noise>0){
+        const seed=(py*dW+px)*2654435761;
+        const nx=((seed^(seed>>>16))&0xffff)/0xffff-0.5;
+        const ny=(((seed*1664525+1013904223)^((seed*1664525+1013904223)>>>16))&0xffff)/0xffff-0.5;
+        x+=noise*nx;y+=noise*ny;z+=noise*nx*0.5;
+      }
+
+      // Spherize: push points onto a sphere surface
+      if(sphere>0){
+        const len=Math.sqrt(x*x+y*y+z*z)||1;
+        const r=1.5;
+        x=x/len*r*sphere+x*(1-sphere);
+        y=y/len*r*sphere+y*(1-sphere);
+        z=z/len*r*sphere+z*(1-sphere);
+      }
+
+      pArr[idx*3]=x;pArr[idx*3+1]=y;pArr[idx*3+2]=z;
+
+      // Color with brightness + contrast
+      let r,g,b;
+      if(cmap==='rgb'){
+        const si=di*4;
+        r=rgba256[si]/255;g=rgba256[si+1]/255;b=rgba256[si+2]/255;
+      }else{
+        [r,g,b]=applyColormap(d,cmap);
+      }
+      // contrast: (c - 0.5) * contrast + 0.5
+      r=Math.max(0,Math.min(1,(r-0.5)*cont+0.5))*bright;
+      g=Math.max(0,Math.min(1,(g-0.5)*cont+0.5))*bright;
+      b=Math.max(0,Math.min(1,(b-0.5)*cont+0.5))*bright;
+      cArr[idx*3]=r;cArr[idx*3+1]=g;cArr[idx*3+2]=b;
+      idx++;
+    }
+  }
+
+  pcGeo.setDrawRange(0,idx);
+  pcGeo.attributes.position.needsUpdate=true;
+  pcGeo.attributes.color.needsUpdate=true;
+  pcMat.size=ptsz*0.006;
+  pcMat.opacity=opac;
+
+  document.getElementById('h-pts').textContent=idx.toLocaleString();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DEPTH PREVIEW
+// ═══════════════════════════════════════════════════════════════
+function updateDepthPreview(depth,dW,dH,rgba256){
+  const cmap=gs('cmap');
+  const id=depCtx.createImageData(186,110);const d=id.data;
+  for(let py=0;py<110;py++){
+    for(let px=0;px<186;px++){
+      const sx=Math.floor(px*dW/186),sy=Math.floor(py*dH/110);
+      const v=depth[sy*dW+sx];
+      let r2,g2,b2;
+      if(cmap==='rgb'){const si=(sy*dW+sx)*4;r2=rgba256[si];g2=rgba256[si+1];b2=rgba256[si+2];}
+      else{const c=applyColormap(v,cmap);r2=c[0]*255;g2=c[1]*255;b2=c[2]*255;}
+      const i=(py*186+px)*4;d[i]=r2;d[i+1]=g2;d[i+2]=b2;d[i+3]=255;
+    }
+  }
+  depCtx.putImageData(id,0,0);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SAVE SYSTEM
+// ═══════════════════════════════════════════════════════════════
+function openSaveModal(){
+  document.getElementById('save-modal').classList.remove('gone');
+}
+function closeSaveModal(){
+  document.getElementById('save-modal').classList.add('gone');
+}
+
+// PNG — screenshot of Three.js canvas
+function savePNG(){
+  syncCam();renderer.render(scene,camera);
+  const name=document.getElementById('save-name').value||'pointcloud';
+  const link=document.createElement('a');
+  link.download=name+'.png';
+  link.href=tc.toDataURL('image/png');
+  link.click();
+  closeSaveModal();setStatus('SAVED: '+name+'.png');
+}
+
+// PLY — standard point cloud format (opens in MeshLab, CloudCompare, Blender)
+function savePLY(){
+  if(!frozenDepth){setStatus('No capture to save');return;}
+  const name=document.getElementById('save-name').value||'pointcloud';
+  const count=pcGeo.drawRange.count;
+  const pos=pcGeo.attributes.position.array;
+  const col=pcGeo.attributes.color.array;
+
+  let ply='ply\nformat ascii 1.0\n';
+  ply+=`element vertex ${count}\n`;
+  ply+='property float x\nproperty float y\nproperty float z\n';
+  ply+='property uchar red\nproperty uchar green\nproperty uchar blue\n';
+  ply+='end_header\n';
+
+  const lines=[];
+  for(let i=0;i<count;i++){
+    const x=pos[i*3].toFixed(5),y=pos[i*3+1].toFixed(5),z=pos[i*3+2].toFixed(5);
+    const r=Math.round(Math.min(1,col[i*3])*255);
+    const g=Math.round(Math.min(1,col[i*3+1])*255);
+    const b=Math.round(Math.min(1,col[i*3+2])*255);
+    lines.push(`${x} ${y} ${z} ${r} ${g} ${b}`);
+  }
+  ply+=lines.join('\n');
+
+  download(name+'.ply',ply,'text/plain');
+  closeSaveModal();setStatus('SAVED: '+name+'.ply ('+count.toLocaleString()+' pts)');
+}
+
+// JSON — raw depth + pixel data + params
+function saveJSON(){
+  if(!frozenDepth){setStatus('No capture to save');return;}
+  const name=document.getElementById('save-name').value||'pointcloud';
+  const count=pcGeo.drawRange.count;
+  const pos=pcGeo.attributes.position.array;
+  const col=pcGeo.attributes.color.array;
+
+  const points=[];
+  for(let i=0;i<count;i++){
+    points.push({
+      x:+pos[i*3].toFixed(4),y:+pos[i*3+1].toFixed(4),z:+pos[i*3+2].toFixed(4),
+      r:+col[i*3].toFixed(3),g:+col[i*3+1].toFixed(3),b:+col[i*3+2].toFixed(3)
+    });
+  }
+
+  const out={
+    meta:{timestamp:new Date().toISOString(),pointCount:count,resolution:'256x256'},
+    params:getCurrentParams(),
+    points
+  };
+  download(name+'.json',JSON.stringify(out,null,2),'application/json');
+  closeSaveModal();setStatus('SAVED: '+name+'.json');
+}
+
+function download(filename,text,mime){
+  const blob=new Blob([text],{type:mime});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  UI
+// ═══════════════════════════════════════════════════════════════
+function toggleEditPanel(){
+  document.getElementById('edit-panel').classList.toggle('hidden');
+}
+function setModeBadge(mode){
+  const b=document.getElementById('mode-badge');
+  b.className='';b.classList.add('mode-badge',mode);
+  if(mode==='live'){b.textContent='● LIVE';b.id='mode-badge';b.className='mode-badge live';b.style.cssText='position:absolute;top:10px;right:10px;z-index:5;pointer-events:none;font-size:9px;letter-spacing:3px;padding:4px 10px;border:1px solid;color:#0ff;border-color:#0ff3;background:#0ff1;text-shadow:0 0 8px #0ff';}
+  else{b.textContent='◼ FROZEN / EDIT';b.style.cssText='position:absolute;top:10px;right:10px;z-index:5;pointer-events:none;font-size:9px;letter-spacing:3px;padding:4px 10px;border:1px solid;color:#ff2d78;border-color:#ff2d7844;background:#ff2d7811';}
+}
+function setStatus(msg){document.getElementById('status-bar').textContent=msg;}
+function hideOverlay(){document.getElementById('overlay').classList.add('gone');}
+function showErr(msg){document.getElementById('ov-err').textContent='⚠ '+msg;document.getElementById('overlay').classList.remove('gone');}
+</script>
+</body>
+</html>
