@@ -25,9 +25,6 @@ The application also displays:
 
 ## 🖼️ Output Example
 
-> Replace with your actual screenshot
-
-
 ![Demo Image](output.png)
 
 
