@@ -27,9 +27,9 @@ The application also displays:
 
 > Replace with your actual screenshot
 
-```
+
 ![Demo Image](output.png)
-```
+
 
 ---
 
