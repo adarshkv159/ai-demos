@@ -1,6 +1,7 @@
 # 🎥 Edge-Accelerated Monocular Depth Perception with Real-Time 3D Point Cloud Visualization on Embedded NPU
 
-This project demonstrates a **real-time monocular depth estimation pipeline** using a quantized **MiDaS v2.1 Small TFLite model**, accelerated on embedded hardware (e.g., i.MX8M Plus NPU).
+This project demonstrates a **real-time monocular depth estimation pipeline** using a quantized **MiDaS v2.1 Small TFLite model**, accelerated on embedded hardware (e.g., phyBOARD®-Pollux
+i.MX 8M Plus NPU).
 
 It captures input from a **webcam or image**, performs **INT8 depth inference**, and renders an interactive **3D point cloud visualization in the browser using Three.js**.
 
@@ -159,7 +160,8 @@ Frontend built using **Three.js for real-time rendering and interaction**
 * Designed for **embedded edge AI systems**
 * Tested on:
 
-  * i.MX8M Plus (NPU via VX delegate)
+  * phyBOARD®-Pollux
+i.MX 8M Plus (NPU via VX delegate)
 * Compatible with:
 
   * ARM64 (aarch64)
