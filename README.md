@@ -35,6 +35,7 @@ This repository is **optimized for deployment** on the NXP-based **phyBOARD-Poll
 | 11 | [🧠 Brain Tumor Detection System](./11-Brain-Tumor-Detection-System) | Brain tumor detection on MRI images
 | 12 | [🕵 PCB Defect Detection System](./12-pcb_defect_detection) | real-time PCB defect detection system built using a YOLOv8
 | 13 | [🎥 Monocular Depth Perception with Real-Time 3D ](./13-EmbedDepth) | Edge-Accelerated Monocular Depth Perception with Real-Time 3D Point Cloud Visualization on Embedded NPU
+| 14 | [🐕 Edge AI Voice Control Quadruped Robot Dog](./14-Robotic_dog_voice_control) |  Edge AI–powered voice control system for a quadruped robot dog
 ---
 
 ## ⚙️ Features
