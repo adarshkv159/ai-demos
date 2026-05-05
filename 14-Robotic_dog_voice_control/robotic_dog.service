@@ -1,0 +1,23 @@
+
+
+[Unit]
+Description=Robotic Dog  Service
+After=network.target local-fs.target
+Requires=network.target local-fs.target
+
+[Service]
+Environment=DISPLAY=:0
+WorkingDirectory=/data/robatic-dog/demo_final
+ExecStart=/data/env/bin/python3 /data/robatic-dog/demo_final/main_v2.py 
+Restart=on-failure
+RestartSec=5
+User=root
+Environment=PYTHONUNBUFFERED=1
+Environment="PATH=/data/env/bin:/usr/bin:/bin"
+
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target
+
