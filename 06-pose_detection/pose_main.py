@@ -37,7 +37,6 @@ SAVE_IMAGE_PATH = 'output.png'
 POSE_THRESHOLD = 0.1
 SSD_MODEL_NAME = 'ssd_mobilenet_v1_quant'
 SSD_MODEL_PATH = file_abs_path(__file__, f'{SSD_MODEL_NAME}.tflite')
-SSD_REMOTE_PATH = 'https://storage.googleapis.com/ailia-models-tflite/ssd_mobilenet_v1/'
 
 # ======================
 # Arguemnt Parser Config
@@ -62,7 +61,6 @@ if args.float:
 else:
     POSE_MODEL_NAME = 'pose_resnet_50_256x192_int8'
 POSE_MODEL_PATH = file_abs_path(__file__, f'{POSE_MODEL_NAME}.tflite')
-POSE_REMOTE_PATH = 'https://storage.googleapis.com/ailia-models-tflite/pose_resnet/'
 
 # ======================
 # Display result
@@ -326,9 +324,6 @@ def recognize_from_video(interpreter_pose, interpreter_detect):
     logger.info('Script finished successfully.')
 
 def main():
-    # Download models if needed
-    check_and_download_models(SSD_MODEL_PATH, SSD_REMOTE_PATH)
-    check_and_download_models(POSE_MODEL_PATH, POSE_REMOTE_PATH)
     # Initialize SSD model (for object detection)
     if args.delegate:
         interpreter_detect = tflite.Interpreter(
