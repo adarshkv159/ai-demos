@@ -30,29 +30,6 @@ def progress_print(block_count, block_size, total_size):
     print(f'[{bar} {percentage:.2f}% ( {total_size_kb:.0f}KB )]', end='\r')
 
 
-def check_and_download_models(model_path, remote_path):
-    """
-    Check if the tflite file exists, and if necessary, download the file to the
-    given path.
-
-    Parameters
-    ----------
-    model_path: string
-        The path of tflite file for ailia.
-    remote_path: string
-        The url where the tflite file is saved.
-        ex. "https://storage.googleapis.com/ailia-models-tflite/mobilenetv2/"
-    """
-
-    if not os.path.exists(model_path):
-        print(f'Downloading tflite file... (save path: {model_path})')
-        urllib.request.urlretrieve(
-            remote_path + os.path.basename(model_path),
-            model_path,
-            progress_print
-        )
-        print('\n')
-    print('TFLite file is prepared!')
 
 
 def format_input_tensor(tensor, input_details, idx):
