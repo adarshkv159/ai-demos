@@ -17,15 +17,6 @@ logger.info('Start!')
 # logger = getLogger(__name__)
 
 
-# TODO: yaml config file and yaml loader
-
-try:
-    import ailia_tflite
-    AILIA_EXIST = True
-except ImportError:
-    logger.warning('ailia_tflite package cannot be found under `sys.path`')
-    AILIA_EXIST = False
-
 def check_file_existance(filename):
     if os.path.isfile(filename):
         return True
