@@ -41,10 +41,9 @@ SAVE_IMAGE_PATH = 'output.png'
 POSE_THRESHOLD = 0.5  # Minimum confidence threshold for keypoints
 SSD_MODEL_NAME = 'ssd_mobilenet_v1_quant'
 SSD_MODEL_PATH = file_abs_path(__file__, f'{SSD_MODEL_NAME}.tflite')
-SSD_REMOTE_PATH = 'https://storage.googleapis.com/ailia-models-tflite/ssd_mobilenet_v1/'
 POSE_MODEL_NAME = 'pose_resnet_50_256x192_int8'
 POSE_MODEL_PATH = file_abs_path(__file__, f'{POSE_MODEL_NAME}.tflite')
-POSE_REMOTE_PATH = 'https://storage.googleapis.com/ailia-models-tflite/pose_resnet/'
+
 
 # ======================
 # Argument Parser Config
@@ -411,9 +410,6 @@ def main():
     except Exception as e:
         print(f"Failed to initialize serial port: {e}")
         ser = None
-
-    check_and_download_models(SSD_MODEL_PATH, SSD_REMOTE_PATH)
-    check_and_download_models(POSE_MODEL_PATH, POSE_REMOTE_PATH)
     
     if args.delegate:
         interpreter_detect = tflite.Interpreter(
