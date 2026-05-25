@@ -25,7 +25,6 @@ def find_and_append_util_path():
 find_and_append_util_path()
 
 from utils import file_abs_path, get_base_parser, update_parser, get_savepath  # noqa: E402
-from model_utils import check_and_download_models  # noqa: E402
 from image_utils import load_image as load_image_img  # noqa: E402
 from pose_resnet_util import compute, keep_aspect  # noqa: E402
 
@@ -62,7 +61,6 @@ if args.float:
 else:
     POSE_MODEL_NAME = 'pose_resnet_50_256x192_int8'
 POSE_MODEL_PATH = file_abs_path(__file__, f'{POSE_MODEL_NAME}.tflite')
-POSE_REMOTE_PATH = 'https://storage.googleapis.com/ailia-models-tflite/pose_resnet/'
 
 # ======================
 # COCO Keypoints Skeleton Definitions
@@ -300,9 +298,6 @@ def recognize_from_video(interpreter_pose, interpreter_detect):
     logger.info('Script finished successfully.')
 
 def main():
-    # Download models if needed
-    check_and_download_models(SSD_MODEL_PATH, SSD_REMOTE_PATH)
-    check_and_download_models(POSE_MODEL_PATH, POSE_REMOTE_PATH)
     # Initialize SSD model (for object detection)
     if args.delegate:
         interpreter_detect = tflite.Interpreter(
