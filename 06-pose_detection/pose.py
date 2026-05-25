@@ -37,7 +37,7 @@ SAVE_IMAGE_PATH = 'output.png'
 POSE_THRESHOLD = 0.4
 SSD_MODEL_NAME = 'ssd_mobilenet_v1_quant'
 SSD_MODEL_PATH = file_abs_path(__file__, f'{SSD_MODEL_NAME}.tflite')
-SSD_REMOTE_PATH = 'https://storage.googleapis.com/ailia-models-tflite/ssd_mobilenet_v1/'
+
 
 # ======================
 # Arguemnt Parser Config
